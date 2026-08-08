@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rosie's Bath">
+<title>Rosie's Bath Time 🛁</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; overflow:hidden; }
+  body {
+    font-family: -apple-system, "SF Pro Rounded", "Arial Rounded MT Bold", "Segoe UI", sans-serif;
+    background: linear-gradient(180deg, #bfe6f7 0%, #dff2fb 55%, #f7e9d7 100%);
+    -webkit-user-select:none; user-select:none;
+    touch-action: manipulation;
+    display:flex; flex-direction:column;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  button { font-family: inherit; -webkit-user-select:none; user-select:none; }
+
+  /* ---------- Top bar ---------- */
+  #topbar {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 14px;
+    z-index: 50;
+  }
+  #topbar .spacer { flex:1; }
+  .pill {
+    background:#fff; border:none; border-radius:999px;
+    padding:8px 16px; font-size:20px; font-weight:800; color:#5a4632;
+    box-shadow:0 3px 0 rgba(0,0,0,.12);
+    display:flex; align-items:center; gap:6px;
+  }
+  button.pill:active { transform: translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,.12); }
+  #coinPill { color:#8a6d00; }
+
+  /* ---------- Stage / world ---------- */
+  #stage { flex:1; position:relative; overflow:hidden; touch-action:none; }
+  #world {
+    position:absolute; width:800px; height:520px;
+    left:50%; top:50%;
+    transform-origin: center center;
+  }
+
+  /* Bathroom decor */
+  .tile-wall {
+    position:absolute; left:-100px; right:-100px; top:-80px; height:300px;
+    background:
+      linear-gradient(rgba(255,255,255,.35), rgba(255,255,255,0)),
+      repeating-linear-gradient(0deg, #cdeaf6 0 58px, #b9def0 58px 62px),
+      repeating-linear-gradient(90deg, #cdeaf6 0 78px, #b9def0 78px 82px);
+    background-blend-mode: normal, multiply, normal;
+    border-bottom: 6px solid #a5cfe4;
+    opacity:.55;
+  }
+  .floor {
+    position:absolute; left:-100px; right:-100px; top:214px; bottom:-80px;
+    background: repeating-linear-gradient(90deg, #ecd9bd 0 96px, #e3cba7 96px 100px);
+    opacity:.75;
+  }
+  .window {
+    position:absolute; left:40px; top:-20px; width:150px; height:120px;
+    background: linear-gradient(180deg,#9fd8f5,#d3f0fd); border:10px solid #fff;
+    border-radius:16px; box-shadow:0 4px 10px rgba(0,0,0,.08);
+  }
+  .window::after { content:"☀️"; position:absolute; right:8px; top:6px; font-size:34px; }
+
+  /* ---------- Tub ---------- */
+  #tubWrap { position:absolute; left:330px; top:180px; width:420px; height:300px; }
+  #tubBack {
+    position:absolute; left:0; top:60px; width:100%; height:170px;
+    background: linear-gradient(#ffffff, #e8eef2); border-radius:30px 30px 0 0;
+    box-shadow: inset 0 8px 0 #d7e2e9;
+  }
+  #water {
+    position:absolute; left:12px; right:12px; bottom:96px; height:0;
+    background: linear-gradient(180deg, rgba(120,200,245,.75), rgba(80,170,230,.85));
+    border-radius: 18px 18px 0 0;
+    transition: height 1.6s ease;
+    z-index:3;
+  }
+  #water.filled { height:120px; }
+  #water .waveline { position:absolute; top:-6px; left:0; right:0; height:12px;
+    background: radial-gradient(circle at 10px 6px, rgba(255,255,255,.8) 4px, transparent 5px);
+    background-size: 34px 12px; opacity:.8; }
+  #tubFront {
+    position:absolute; left:-14px; top:150px; width:calc(100% + 28px); height:130px;
+    background: linear-gradient(#ffffff, #dbe6ec 70%, #c9d7df);
+    border-radius: 26px 26px 40px 40px;
+    box-shadow: 0 8px 0 rgba(0,0,0,.08), inset 0 6px 0 #fff;
+    z-index:6;
+  }
+  .tub-leg { position:absolute; top:272px; width:26px; height:26px; background:#c3b39a; border-radius:0 0 12px 12px; z-index:5; }
+  #faucet {
+    position:absolute; right:-6px; top:-6px; z-index:7; width:90px; height:90px;
+    pointer-events:none;
+  }
+  #faucetStream {
+    position:absolute; right:34px; top:74px; width:14px; height:0; z-index:7;
+    background: linear-gradient(rgba(140,210,250,.9), rgba(100,190,240,.7));
+    border-radius:7px; transition: height .3s;
+  }
+  #faucetStream.on { height:120px; }
+
+  /* ---------- Rosie ---------- */
+  #rosie {
+    position:absolute; width:190px; height:200px;
+    left:70px; top:280px; z-index:4;
+    transition: left .8s cubic-bezier(.34,1.4,.5,1), top .8s cubic-bezier(.34,1.4,.5,1), transform .4s;
+    cursor:grab;
+  }
+  #rosie.dragging { transition:none; cursor:grabbing; }
+  #rosie.hint { animation: bounce-hint 1.4s ease-in-out infinite; }
+  @keyframes bounce-hint { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+  #rosie.wiggle { animation: wiggle .5s ease; }
+  @keyframes wiggle { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-6deg)} 75%{transform:rotate(6deg)} }
+  #rosie.shake-dry { animation: shakedry .7s ease; }
+  @keyframes shakedry { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-10deg)} 40%{transform:rotate(10deg)} 60%{transform:rotate(-8deg)} 80%{transform:rotate(8deg)} }
+  #rosie svg { width:100%; height:100%; overflow:visible; }
+
+  /* Rosie states */
+  #rosie .tongue { opacity:0; transition:opacity .3s; }
+  #rosie.happy .tongue { opacity:1; }
+  #rosie .wet-drips { opacity:0; }
+  #rosie.wet .wet-drips { opacity:1; }
+  #rosie.wet .fur { filter: brightness(.88) saturate(1.15); }
+  #rosie.fluffy .fluff { transform: scale(1.12); transform-origin: 95px 60px; }
+  #rosie .sparkles { opacity:0; transition: opacity .5s; }
+  #rosie.sparkly .sparkles { opacity:1; }
+  #rosie .eye { transform-origin:center; animation: blink 4.5s infinite; }
+  @keyframes blink { 0%,94%,100%{transform:scaleY(1)} 96%,98%{transform:scaleY(.1)} }
+
+  /* ---------- Bubbles / knots / effects in world ---------- */
+  .bubble {
+    position:absolute; z-index:5; border-radius:50%;
+    background: radial-gradient(circle at 32% 30%, rgba(255,255,255,.95) 12%, rgba(220,240,255,.55) 55%, rgba(190,225,250,.35));
+    box-shadow: inset -3px -3px 6px rgba(150,190,220,.4), 0 2px 6px rgba(0,0,0,.06);
+    cursor:pointer;
+    animation: bob 2.6s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+  .bubble.pop { animation: popb .35s ease forwards; }
+  @keyframes popb { 60%{transform:scale(1.5); opacity:.7} 100%{transform:scale(2); opacity:0} }
+
+  .knot {
+    position:absolute; z-index:7; width:52px; height:52px; cursor:pointer;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.2));
+    animation: bob 2.2s ease-in-out infinite;
+  }
+  .knot svg { width:100%; height:100%; overflow:visible; }
+  .knot.gone { animation: popb .4s ease forwards; }
+
+  /* temperature dial */
+  #dialCard { position:absolute; left:10px; top:30px; width:320px; background:rgba(255,255,255,.96);
+    border-radius:24px; box-shadow:0 10px 26px rgba(0,0,0,.2); padding:12px 12px 14px; z-index:40; text-align:center; }
+  #dialCard.done { animation: fadeaway .8s ease forwards; }
+  @keyframes fadeaway { to { opacity:0; transform:scale(.9); } }
+  #dialBtns { display:flex; gap:12px; justify-content:center; margin-top:4px; }
+  .dialBtn { border:none; border-radius:18px; padding:14px 18px; font-size:21px; font-weight:800; color:#4a3a28;
+    cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.15); }
+  .dialBtn:active { transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,.15); }
+
+  /* dryer zones */
+  .dryzone { position:absolute; z-index:8; border-radius:40%; pointer-events:none;
+    display:flex; align-items:center; justify-content:center; }
+  .dryzone .glow { position:absolute; inset:-6px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,110,30,.6), transparent 70%); opacity:0; }
+  .dryzone.burn .glow { background:radial-gradient(circle, rgba(255,40,20,.75), transparent 70%); opacity:1 !important; }
+  .dryzone .ico { position:relative; font-size:34px; filter:drop-shadow(0 2px 2px rgba(0,0,0,.2)); }
+
+  /* shampoo bottle + squirt drops */
+  #shampooBottle { position:absolute; left:236px; top:280px; width:86px; height:124px;
+    z-index:30; cursor:pointer; transition:transform .15s;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,.18)); }
+  #shampooBottle.hint { animation: bounce-hint 1.4s ease-in-out infinite; }
+  #shampooBottle.squeeze { transform:scaleY(.9) scaleX(1.07); }
+  .sdrop { position:absolute; border-radius:50%; z-index:9; pointer-events:none;
+    transition: left .55s ease-in, top .55s ease-in, opacity .55s; }
+
+  /* conditioner */
+  #condUI { position:absolute; left:0; top:0; z-index:30; }
+  #condBottle { position:absolute; cursor:pointer; transition:transform .15s; }
+  #condBottle.squeeze { transform:scaleY(.93) scaleX(1.05); }
+  #condBottle.hint { animation: bounce-hint 1.4s ease-in-out infinite; }
+  #condMeter { position:absolute; width:30px; height:180px; background:#eef2f5; border-radius:15px;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,.15); }
+  #condGreen { position:absolute; left:0; right:0; background:rgba(110,200,110,.55); }
+  #condFill { position:absolute; left:3px; right:3px; bottom:3px; height:0; background:#e78fb3; border-radius:12px; }
+  #condMeter.flash { animation: redflash .5s ease 2; }
+  @keyframes redflash { 50% { box-shadow: inset 0 0 0 4px #e2574c; } }
+  .cream { position:absolute; z-index:8; pointer-events:none;
+    background: radial-gradient(circle at 40% 30%, #ffffff, #f1e8d8);
+    border-radius: 55% 55% 48% 48%; box-shadow:0 2px 6px rgba(0,0,0,.1);
+    transition: opacity .6s; }
+
+  .float-emoji { position:absolute; z-index:20; font-size:40px; pointer-events:none;
+    animation: floatup 1.4s ease forwards; }
+  @keyframes floatup { 0%{opacity:0; transform:translateY(10px) scale(.6)} 20%{opacity:1}
+    100%{opacity:0; transform:translateY(-70px) scale(1.3)} }
+
+  .toast-bubble {
+    position:absolute; z-index:21; background:#fff; color:#5a4632;
+    font-size:26px; font-weight:800; padding:8px 18px; border-radius:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,.15); pointer-events:none;
+    animation: toastpop 1.6s ease forwards; white-space:nowrap;
+  }
+  .toast-bubble::after { content:""; position:absolute; left:24px; bottom:-10px;
+    border:10px solid transparent; border-top-color:#fff; border-bottom:none; }
+  @keyframes toastpop { 0%{opacity:0; transform:scale(.5)} 15%{opacity:1; transform:scale(1.05)}
+    25%{transform:scale(1)} 80%{opacity:1} 100%{opacity:0; transform:translateY(-14px)} }
+
+  .confetti { position:absolute; z-index:40; font-size:30px; pointer-events:none;
+    animation: fall linear forwards; top:-40px; }
+  @keyframes fall { to { transform: translateY(640px) rotate(540deg); opacity:.6; } }
+
+  /* held tool (shower head / dryer / brush) */
+  #tool {
+    position:absolute; z-index:30; font-size:64px; pointer-events:none; display:none;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,.2));
+    transition: left .15s, top .15s;
+  }
+
+  /* ---------- Bottom instruction card ---------- */
+  #bottomCard {
+    background:#fff; border-radius:26px 26px 0 0;
+    box-shadow: 0 -6px 20px rgba(0,0,0,.10);
+    padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+    z-index: 45;
+  }
+  #instrRow { display:flex; align-items:center; gap:12px; max-width:760px; margin:0 auto; }
+  #speakBtn {
+    flex:none; width:64px; height:64px; border-radius:50%; border:none;
+    background:#ffd44d; font-size:30px; box-shadow:0 4px 0 #d9ac16; cursor:pointer;
+  }
+  #speakBtn:active { transform:translateY(3px); box-shadow:0 1px 0 #d9ac16; }
+  #instrText { font-size:26px; font-weight:800; color:#4a3a28; line-height:1.25; }
+  #choiceRow {
+    display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+    max-width:760px; margin:12px auto 0;
+  }
+  #choiceRow:empty { margin:0; }
+  .choice {
+    border:none; border-radius:22px; padding:14px 20px; min-width:150px; min-height:84px;
+    font-size:24px; font-weight:800; color:#4a3a28; cursor:pointer;
+    box-shadow: 0 5px 0 rgba(0,0,0,.15);
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+  }
+  .choice .big { font-size:40px; line-height:1; }
+  .choice:active { transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,.15); }
+  .choice.c-blue { background:#cfeeff; } .choice.c-green { background:#d7f5cf; }
+  .choice.c-red { background:#ffd9cf; } .choice.c-pink { background:#ffdef0; }
+  .choice.c-yellow { background:#fff1bd; } .choice.c-purple { background:#e9dfff; }
+  .choice.correct-glow { animation: glow 1s ease-in-out infinite; }
+  @keyframes glow { 0%,100%{box-shadow:0 5px 0 rgba(0,0,0,.15)} 50%{box-shadow:0 5px 0 rgba(0,0,0,.15), 0 0 24px 6px #ffd44d} }
+
+  /* ---------- Overlays (shop / grown-ups / win) ---------- */
+  .overlay {
+    position:fixed; inset:0; background:rgba(40,60,80,.45); z-index:100;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .overlay.show { display:flex; }
+  .panel {
+    background:#fff; border-radius:28px; padding:24px; width:min(560px, 94vw);
+    max-height:86vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    box-shadow:0 16px 40px rgba(0,0,0,.25);
+  }
+  .panel h2 { font-size:30px; color:#4a3a28; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .panel .closeX { float:right; border:none; background:#eee; border-radius:50%;
+    width:44px; height:44px; font-size:22px; cursor:pointer; }
+  .shop-item { display:flex; align-items:center; gap:14px; background:#fdf6e6;
+    border-radius:18px; padding:14px; margin-bottom:12px; }
+  .shop-item .icon { font-size:44px; }
+  .shop-item .info { flex:1; }
+  .shop-item .name { font-size:22px; font-weight:800; color:#4a3a28; }
+  .shop-item .price { font-size:18px; color:#8a6d00; font-weight:700; }
+  .buyBtn { border:none; border-radius:14px; background:#59c15e; color:#fff;
+    font-size:20px; font-weight:800; padding:12px 18px; cursor:pointer; box-shadow:0 4px 0 #3d9a42; }
+  .buyBtn:disabled { background:#ccc; box-shadow:0 4px 0 #aaa; }
+  .buyBtn:active:not(:disabled) { transform:translateY(2px); box-shadow:0 2px 0 #3d9a42; }
+  .owed { background:#e8f6ff; border-radius:14px; padding:10px 14px; margin-bottom:8px;
+    display:flex; align-items:center; gap:10px; font-size:18px; font-weight:700; color:#345; }
+  .owed button { margin-left:auto; border:none; background:#59c15e; color:#fff; border-radius:10px;
+    padding:8px 12px; font-size:16px; font-weight:800; cursor:pointer; }
+  .ga-row { display:flex; align-items:center; gap:10px; margin:10px 0; font-size:18px; color:#4a3a28; font-weight:700; flex-wrap:wrap; }
+  .ga-row input[type=number] { width:100px; font-size:20px; padding:8px; border-radius:10px; border:2px solid #ccc; }
+  .ga-row input[type=text], .ga-row textarea { flex:1; min-width:180px; font-size:16px; padding:8px; border-radius:10px; border:2px solid #ccc; font-family:monospace; }
+  .ga-btn { border:none; border-radius:12px; background:#4a90d9; color:#fff; font-size:17px;
+    font-weight:800; padding:10px 16px; cursor:pointer; box-shadow:0 3px 0 #33689e; }
+  .ga-btn.warn { background:#d9634a; box-shadow:0 3px 0 #a13c28; }
+  .ga-btn:active { transform:translateY(2px); box-shadow:none; }
+  .gate-q { font-size:24px; font-weight:800; color:#4a3a28; margin:8px 0; }
+  #gateInput { font-size:28px; width:120px; padding:10px; border-radius:12px; border:3px solid #ccc; text-align:center; }
+  .divider { border:none; border-top:2px dashed #ddd; margin:16px 0; }
+  .muted { color:#888; font-size:15px; font-weight:600; }
+
+  /* win screen */
+  #winPanel { text-align:center; }
+  #winPanel .bigdog { font-size:80px; }
+  #winPanel h2 { justify-content:center; }
+  #winCoins { font-size:26px; color:#8a6d00; font-weight:800; margin:10px 0; }
+  .winBtns { display:flex; gap:14px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="pill" id="coinPill">🪙 <span id="coinCount">0</span></div>
+  <div class="pill" style="font-size:17px;">🛁 Rosie's Bath Time</div>
+  <div class="spacer"></div>
+  <button class="pill" id="shopBtn">🎁 Shop</button>
+  <button class="pill" id="grownBtn" style="font-size:16px;">👨‍👩‍👦 Grown-ups</button>
+</div>
+
+<div id="stage">
+  <div id="world">
+    <div class="tile-wall"></div>
+    <div class="floor"></div>
+    <div class="window"></div>
+
+    <div id="tubWrap">
+      <div id="tubBack"></div>
+      <div id="water"><div class="waveline"></div></div>
+      <div id="tubFront"></div>
+      <div class="tub-leg" style="left:16px;"></div>
+      <div class="tub-leg" style="right:16px;"></div>
+      <svg id="faucet" viewBox="0 0 90 90">
+        <rect x="60" y="6" width="16" height="40" rx="8" fill="#b9c6ce"/>
+        <path d="M68 14 h-30 a14 14 0 0 0 -14 14 v10" fill="none" stroke="#b9c6ce" stroke-width="16" stroke-linecap="round"/>
+        <circle cx="68" cy="8" r="10" fill="#d3dde3"/>
+      </svg>
+      <div id="faucetStream"></div>
+    </div>
+
+    <div id="rosie"></div>
+    <div id="tool"></div>
+  </div>
+</div>
+
+<div id="bottomCard">
+  <div id="instrRow">
+    <button id="speakBtn" aria-label="Read aloud">🔊</button>
+    <div id="instrText">Hello!</div>
+  </div>
+  <div id="choiceRow"></div>
+</div>
+
+<!-- ===== Prize Shop ===== -->
+<div class="overlay" id="shopOverlay">
+  <div class="panel">
+    <button class="closeX" data-close="shopOverlay">✕</button>
+    <h2>🎁 Prize Shop</h2>
+    <div style="font-size:20px; font-weight:800; color:#8a6d00; margin-bottom:12px;">You have 🪙 <span id="shopCoins">0</span></div>
+    <div id="shopItems"></div>
+    <div id="owedSection" style="display:none;">
+      <hr class="divider">
+      <h2 style="font-size:22px;">🏆 Prizes to collect</h2>
+      <div class="muted" style="margin-bottom:8px;">Show Mum or Dad!</div>
+      <div id="owedListShop"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Grown-ups gate + area ===== -->
+<div class="overlay" id="grownOverlay">
+  <div class="panel">
+    <button class="closeX" data-close="grownOverlay">✕</button>
+    <div id="gateBox">
+      <h2>👨‍👩‍👦 Grown-ups only</h2>
+      <div class="gate-q" id="gateQ">What is 3 × 4?</div>
+      <div class="ga-row">
+        <input type="number" id="gateInput" inputmode="numeric" placeholder="?">
+        <button class="ga-btn" id="gateGo">Enter</button>
+      </div>
+    </div>
+    <div id="grownBox" style="display:none;">
+      <h2>⚙️ Grown-ups area</h2>
+
+      <h2 style="font-size:20px;">Prize prices</h2>
+      <div class="ga-row">🃏 Pokémon card: <input type="number" id="priceCard" inputmode="numeric"> coins</div>
+      <div class="ga-row">🎴 Pokémon pack: <input type="number" id="pricePack" inputmode="numeric"> coins</div>
+      <button class="ga-btn" id="savePrices">Save prices</button>
+
+      <hr class="divider">
+      <h2 style="font-size:20px;">Prizes owed</h2>
+      <div id="owedListGrown" class="muted">None yet.</div>
+
+      <hr class="divider">
+      <h2 style="font-size:20px;">Coins</h2>
+      <div class="ga-row">Set coins: <input type="number" id="setCoins" inputmode="numeric">
+        <button class="ga-btn" id="applyCoins">Apply</button></div>
+      <div class="muted">Baths finished: <span id="bathCount">0</span></div>
+
+      <hr class="divider">
+      <h2 style="font-size:20px;">💾 Backup &amp; restore</h2>
+      <div class="muted" style="margin-bottom:6px;">Copy this code somewhere safe. Paste it on a new device to restore coins and prizes.</div>
+      <div class="ga-row"><textarea id="backupCode" rows="2" readonly></textarea></div>
+      <div class="ga-row">
+        <button class="ga-btn" id="makeBackup">Make backup code</button>
+        <button class="ga-btn" id="copyBackup">Copy</button>
+      </div>
+      <div class="ga-row"><input type="text" id="restoreCode" placeholder="Paste backup code here">
+        <button class="ga-btn" id="doRestore">Restore</button></div>
+
+      <hr class="divider">
+      <button class="ga-btn warn" id="resetAll">🗑 Reset everything</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Win screen ===== -->
+<div class="overlay" id="winOverlay">
+  <div class="panel" id="winPanel">
+    <div class="bigdog">🐶✨</div>
+    <h2>You gave Rosie a bath!</h2>
+    <div style="font-size:20px; color:#666; font-weight:700;">She is clean and fluffy. Good job!</div>
+    <div id="winCoins">+ 🪙 <span id="winCoinAmt">0</span> coins!</div>
+    <div class="winBtns">
+      <button class="choice c-yellow" id="winShop"><span class="big">🎁</span>Prize Shop</button>
+      <button class="choice c-green" id="winAgain"><span class="big">🛁</span>Wash again!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ================= State & storage ================= */
+const SAVE_KEY = 'rosieBath.v1';
+const DEFAULTS = { coins:0, baths:0, prices:{card:150, pack:500}, owed:[] };
+let S = load();
+
+function load(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(!raw) return JSON.parse(JSON.stringify(DEFAULTS));
+    const d = JSON.parse(raw);
+    return Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), d,
+      { prices: Object.assign({}, DEFAULTS.prices, d.prices||{}) });
+  } catch(e){ return JSON.parse(JSON.stringify(DEFAULTS)); }
+}
+function save(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch(e){} }
+
+/* ================= Speech ================= */
+let voice = null;
+function pickVoice(){
+  if(!('speechSynthesis' in window)) return;
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v=>v.lang==='en-AU') || vs.find(v=>v.lang&&v.lang.startsWith('en-AU'))
+       || vs.find(v=>v.lang==='en-GB') || vs.find(v=>v.lang&&v.lang.startsWith('en')) || null;
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+let lastSpoken = '';
+function say(text, remember=true){
+  if(remember) lastSpoken = text;
+  if(!('speechSynthesis' in window)) return;
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if(voice) u.voice = voice;
+    u.rate = 0.92; u.pitch = 1.05;
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+
+/* ================= Tiny sounds (WebAudio) ================= */
+let AC = null;
+function ac(){ if(!AC){ try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return AC; }
+function tone(freq, dur=0.12, type='sine', vol=0.15, when=0){
+  const c = ac(); if(!c) return;
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, c.currentTime + when);
+  g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + when + dur);
+  o.connect(g); g.connect(c.destination);
+  o.start(c.currentTime + when); o.stop(c.currentTime + when + dur + 0.02);
+}
+const sfx = {
+  pop(){ tone(600,0.08,'sine',0.2); tone(900,0.08,'sine',0.12,0.04); },
+  yay(){ [523,659,784,1047].forEach((f,i)=>tone(f,0.18,'triangle',0.14,i*0.11)); },
+  coin(){ tone(988,0.09,'square',0.08); tone(1319,0.16,'square',0.08,0.09); },
+  no(){ tone(300,0.2,'sine',0.12); tone(240,0.25,'sine',0.12,0.15); },
+  splash(){ tone(400,0.3,'sine',0.1); tone(250,0.35,'sine',0.08,0.1); },
+  munch(){ tone(180,0.08,'square',0.1); tone(150,0.08,'square',0.1,0.1); },
+};
+
+/* ================= World scaling ================= */
+const world = document.getElementById('world');
+let worldScale = 1;
+function fitWorld(){
+  const st = document.getElementById('stage').getBoundingClientRect();
+  worldScale = Math.min(st.width/820, st.height/530);
+  world.style.transform = `translate(-50%,-50%) scale(${worldScale})`;
+}
+window.addEventListener('resize', fitWorld);
+function worldPoint(clientX, clientY){
+  const r = world.getBoundingClientRect();
+  return { x:(clientX - r.left)/worldScale, y:(clientY - r.top)/worldScale };
+}
+
+/* ================= Rosie SVG ================= */
+const FUR = '#A55A2B', FUR_LIGHT = '#BC7038', FUR_DARK = '#7E4A20', WHITE = '#FFF6EC';
+function rosieSVG(){
+  // Rosie: ruby cavoodle — chestnut curls, white blaze + white chest (from her photo)
+  let fluffHead = '';
+  const headPts = [[55,52],[72,38],[95,32],[118,38],[135,52],[142,72],[138,92],[52,92],[48,72]];
+  headPts.forEach(p=>{ fluffHead += `<circle cx="${p[0]}" cy="${p[1]}" r="20" fill="${FUR}"/>`; });
+  let fluffBody = '';
+  const bodyPts = [[60,150],[85,142],[115,142],[140,150],[150,165],[145,180],[55,180],[45,165]];
+  bodyPts.forEach(p=>{ fluffBody += `<circle cx="${p[0]}" cy="${p[1]}" r="18" fill="${FUR}"/>`; });
+  const curls = [[60,54],[126,56],[66,88],[122,88],[66,158],[120,158],[92,174]]
+    .map(p=>`<path d="M${p[0]} ${p[1]} a 8 8 0 0 1 12 3" fill="none" stroke="${FUR_DARK}" stroke-width="3.5" stroke-linecap="round" opacity=".3"/>`).join('');
+  return `
+  <svg viewBox="0 0 190 200" aria-label="Rosie the cavoodle">
+    <g class="fur">
+      <!-- body -->
+      <g class="body-group" transform="translate(0,-14)">
+        ${fluffBody}
+        <ellipse cx="97" cy="163" rx="52" ry="34" fill="${FUR}"/>
+        <ellipse cx="97" cy="158" rx="38" ry="24" fill="${FUR_LIGHT}" opacity=".55"/>
+        <!-- white chest patch -->
+        <circle cx="86" cy="143" r="13" fill="${WHITE}"/>
+        <circle cx="106" cy="143" r="13" fill="${WHITE}"/>
+        <circle cx="96" cy="155" r="14" fill="${WHITE}"/>
+        <!-- legs -->
+        <rect x="62" y="178" width="16" height="20" rx="8" fill="${FUR}"/>
+        <rect x="112" y="178" width="16" height="20" rx="8" fill="${FUR}"/>
+        <!-- tail -->
+        <path class="tail" d="M148 155 q 22 -10 18 -30" fill="none" stroke="${FUR}" stroke-width="14" stroke-linecap="round"/>
+      </g>
+      <!-- head -->
+      <g class="fluff">${fluffHead}</g>
+      <ellipse cx="95" cy="70" rx="45" ry="42" fill="${FUR}"/>
+      <!-- ears: long + floppy like the photo -->
+      <ellipse cx="44" cy="84" rx="17" ry="36" fill="${FUR_DARK}" transform="rotate(12 44 84)"/>
+      <ellipse cx="146" cy="84" rx="17" ry="36" fill="${FUR_DARK}" transform="rotate(-12 146 84)"/>
+      <!-- white blaze down the middle of her face -->
+      <path d="M95 36 C 90 52 87 64 85 78 L 105 78 C 103 64 100 52 95 36 Z" fill="${WHITE}"/>
+      <ellipse cx="95" cy="87" rx="19" ry="15" fill="${WHITE}"/>
+      ${curls}
+      <!-- eyes -->
+      <g class="eye"><circle cx="76" cy="63" r="8" fill="#241505"/><circle cx="79" cy="60" r="2.8" fill="#fff"/></g>
+      <g class="eye"><circle cx="114" cy="63" r="8" fill="#241505"/><circle cx="117" cy="60" r="2.8" fill="#fff"/></g>
+      <!-- nose + mouth -->
+      <ellipse cx="95" cy="80" rx="9.5" ry="7" fill="#181410"/>
+      <path d="M95 87 q 0 6 -7 8 M95 87 q 0 6 7 8" fill="none" stroke="#3a2a1a" stroke-width="3" stroke-linecap="round"/>
+      <ellipse class="tongue" cx="95" cy="100" rx="7" ry="9" fill="#f2889b"/>
+    </g>
+    <g class="wet-drips">
+      <path d="M58 44 q -3 8 0 10 q 4 -2 0 -10" fill="#8fd0f0"/>
+      <path d="M133 46 q -3 8 0 10 q 4 -2 0 -10" fill="#8fd0f0"/>
+      <path d="M95 30 q -3 8 0 10 q 4 -2 0 -10" fill="#8fd0f0"/>
+    </g>
+    <g class="sparkles" font-size="20">
+      <text x="30" y="40">✨</text><text x="140" y="34">✨</text><text x="152" y="120">✨</text><text x="18" y="120">✨</text>
+    </g>
+  </svg>`;
+}
+const rosie = document.getElementById('rosie');
+rosie.innerHTML = rosieSVG();
+
+/* Rosie position helpers (world coords) */
+const POS = { start:{x:70,y:280}, tub:{x:430,y:170} };
+function placeRosie(p){ rosie.style.left = p.x+'px'; rosie.style.top = p.y+'px'; }
+function rosieState(cls, on){ rosie.classList.toggle(cls, !!on); }
+
+/* ================= Effects ================= */
+function floatEmoji(x, y, emoji){
+  const e = document.createElement('div');
+  e.className = 'float-emoji'; e.textContent = emoji;
+  e.style.left = x+'px'; e.style.top = y+'px';
+  world.appendChild(e);
+  setTimeout(()=>e.remove(), 1500);
+}
+function toast(x, y, text){
+  const t = document.createElement('div');
+  t.className = 'toast-bubble'; t.textContent = text;
+  t.style.left = x+'px'; t.style.top = y+'px';
+  world.appendChild(t);
+  setTimeout(()=>t.remove(), 1700);
+}
+function confettiBurst(){
+  const emojis = ['🎉','⭐','💛','🫧','🎊','✨','🐾'];
+  for(let i=0;i<26;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    c.style.left = (Math.random()*780)+'px';
+    c.style.animationDuration = (1.8+Math.random()*1.6)+'s';
+    c.style.animationDelay = (Math.random()*0.8)+'s';
+    world.appendChild(c);
+    setTimeout(()=>c.remove(), 4200);
+  }
+}
+function addCoins(n){
+  S.coins += n; save(); renderCoins();
+  sfx.coin();
+}
+function renderCoins(){
+  document.getElementById('coinCount').textContent = S.coins;
+  document.getElementById('shopCoins').textContent = S.coins;
+}
+
+/* ================= Instruction UI ================= */
+const instrText = document.getElementById('instrText');
+const choiceRow = document.getElementById('choiceRow');
+function instruct(text, speak=true){
+  instrText.textContent = text;
+  if(speak) say(text);
+}
+document.getElementById('speakBtn').addEventListener('click', ()=>{ if(lastSpoken) say(lastSpoken, false); });
+
+function clearChoices(){ choiceRow.innerHTML = ''; }
+function addChoice(emoji, label, color, onTap){
+  const b = document.createElement('button');
+  b.className = 'choice ' + color;
+  b.innerHTML = `<span class="big">${emoji}</span>${label}`;
+  b.addEventListener('click', ()=>onTap(b));
+  choiceRow.appendChild(b);
+  return b;
+}
+
+/* ================= Game flow ================= */
+const water = document.getElementById('water');
+const faucetStream = document.getElementById('faucetStream');
+const tool = document.getElementById('tool');
+let stepCoins = 0;          // coins earned this bath
+let wrongTries = 0;         // per-question gentle-help counter
+let favShampoo = 0;         // index of Rosie's favourite this bath
+
+function stepDone(bonusText){
+  stepCoins += 5;
+  addCoins(5);
+  if(bonusText) toast(POS.tub.x+40, POS.tub.y-40, bonusText);
+}
+
+function startBath(){
+  stepCoins = 0;
+  wrongTries = 0;
+  favShampoo = Math.floor(Math.random()*3);
+  water.classList.remove('filled');
+  faucetStream.classList.remove('on');
+  rosie.className = '';
+  rosie.style.display = '';
+  placeRosie(POS.start);
+  clearChoices();
+  document.querySelectorAll('.bubble,.knot,.dryzone,.cream,.sdrop,#dialCard,#condUI,#shampooBottle').forEach(e=>e.remove());
+  if(dialState){ clearInterval(dialState.timer); dialState = null; }
+  if(dryState){ dryState.active = false; dryState = null; }
+  condState = null;
+  tool.style.display = 'none';
+  step1();
+}
+
+/* ---------- Step 1: get Rosie in the bath ---------- */
+function step1(){
+  instruct("Bath time! Put Rosie in the bath.");
+  rosie.classList.add('hint');
+  enableRosieDrag();
+}
+
+let dragOn = false;
+function enableRosieDrag(){
+  dragOn = true;
+}
+function disableRosieDrag(){ dragOn = false; }
+
+(function setupDrag(){
+  let dragging = false, startPt = null, startPos = null, moved = false;
+  rosie.addEventListener('pointerdown', (ev)=>{
+    if(!dragOn) return;
+    dragging = true; moved = false;
+    rosie.setPointerCapture(ev.pointerId);
+    rosie.classList.add('dragging');
+    rosie.classList.remove('hint');
+    startPt = worldPoint(ev.clientX, ev.clientY);
+    startPos = { x: parseFloat(rosie.style.left)||POS.start.x, y: parseFloat(rosie.style.top)||POS.start.y };
+  });
+  rosie.addEventListener('pointermove', (ev)=>{
+    if(!dragging) return;
+    const p = worldPoint(ev.clientX, ev.clientY);
+    const dx = p.x-startPt.x, dy = p.y-startPt.y;
+    if(Math.abs(dx)+Math.abs(dy) > 8) moved = true;
+    rosie.style.left = (startPos.x+dx)+'px';
+    rosie.style.top = (startPos.y+dy)+'px';
+  });
+  rosie.addEventListener('pointerup', (ev)=>{
+    if(!dragging) return;
+    dragging = false;
+    rosie.classList.remove('dragging');
+    const x = parseFloat(rosie.style.left), y = parseFloat(rosie.style.top);
+    const overTub = x > 300 && x < 700 && y < 400;
+    if(!moved || overTub){
+      hopIn();           // tap OR dropped on tub → in she goes
+    } else {
+      placeRosie(POS.start);   // spring back gently
+    }
+  });
+})();
+
+function hopIn(){
+  disableRosieDrag();
+  rosie.classList.remove('hint');
+  placeRosie(POS.tub);
+  sfx.splash();
+  setTimeout(()=>{
+    toast(POS.tub.x+130, POS.tub.y-20, "Woof!");
+    stepDone();
+    setTimeout(step2, 700);
+  }, 850);
+}
+
+/* ---------- Step 2: twist the tap — land the arrow in the green middle ---------- */
+let dialState = null;
+function step2(){
+  instruct("Twist the tap! Get the arrow to the green middle.");
+  clearChoices();
+  buildDial();
+}
+function dialPolar(a, r){
+  return { x: 120 + r*Math.sin(a*Math.PI/180), y: 118 - r*Math.cos(a*Math.PI/180) };
+}
+function dialArc(a1, a2, color){
+  const p1 = dialPolar(a1, 86), p2 = dialPolar(a2, 86);
+  return `<path d="M ${p1.x} ${p1.y} A 86 86 0 0 1 ${p2.x} ${p2.y}" fill="none" stroke="${color}" stroke-width="24"/>`;
+}
+function buildDial(){
+  const starts = [-72, -58, 58, 72];
+  dialState = { angle: starts[Math.floor(Math.random()*4)], dwell: 0, lastZone: '', done: false, timer: null };
+  const card = document.createElement('div');
+  card.id = 'dialCard';
+  card.innerHTML = `
+    <svg id="dialSvg" viewBox="0 0 240 148">
+      ${dialArc(-84,-16,'#6cb9e8')}${dialArc(-16,16,'#5fc75f')}${dialArc(16,84,'#ef8d76')}
+      <text x="14" y="140" font-size="26">❄️</text>
+      <text x="198" y="140" font-size="26">🔥</text>
+      <g id="needleG"><line x1="120" y1="118" x2="120" y2="44" stroke="#4a3a28" stroke-width="9" stroke-linecap="round"/></g>
+      <circle cx="120" cy="118" r="15" fill="#4a3a28"/>
+    </svg>
+    <div id="dialBtns">
+      <button class="dialBtn" style="background:#cfeeff">❄️ Colder</button>
+      <button class="dialBtn" style="background:#ffd9cf">🔥 Hotter</button>
+    </div>`;
+  world.appendChild(card);
+  const btns = card.querySelectorAll('.dialBtn');
+  btns[0].addEventListener('click', ()=>nudgeDial(-8));
+  btns[1].addEventListener('click', ()=>nudgeDial(8));
+  // twist by dragging on the dial too
+  const svg = card.querySelector('#dialSvg');
+  let twisting = false;
+  svg.addEventListener('pointerdown', (ev)=>{ twisting = true; svg.setPointerCapture(ev.pointerId); twistTo(ev); });
+  svg.addEventListener('pointermove', (ev)=>{ if(twisting) twistTo(ev); });
+  svg.addEventListener('pointerup', ()=>{ twisting = false; });
+  function twistTo(ev){
+    const r = svg.getBoundingClientRect();
+    const cx = r.left + r.width*(120/240), cy = r.top + r.height*(118/148);
+    setDialAngle(Math.atan2(ev.clientX-cx, cy-ev.clientY) * 180/Math.PI);
+  }
+  renderDial();
+  dialState.timer = setInterval(dialCheck, 120);
+}
+function nudgeDial(d){
+  if(!dialState || dialState.done) return;
+  tone(Math.max(220, 420 + dialState.angle*2), .08, 'sine', .08);
+  setDialAngle(dialState.angle + d);
+}
+function setDialAngle(a){
+  if(!dialState || dialState.done) return;
+  dialState.angle = Math.max(-84, Math.min(84, a));
+  renderDial();
+}
+function renderDial(){
+  const g = document.getElementById('needleG');
+  if(g) g.setAttribute('transform', `rotate(${dialState.angle} 120 118)`);
+}
+function dialZone(){ const a = dialState.angle; return a < -16 ? 'cold' : (a > 16 ? 'hot' : 'green'); }
+function dialCheck(){
+  if(!dialState || dialState.done) return;
+  const z = dialZone();
+  if(z !== dialState.lastZone){
+    dialState.lastZone = z;
+    if(z==='hot'){ floatEmoji(POS.tub.x+150, POS.tub.y+30, '♨️'); toast(POS.tub.x+130, POS.tub.y-30, "Too hot!"); sfx.no(); }
+    if(z==='cold'){ floatEmoji(POS.tub.x+150, POS.tub.y+30, '🥶'); toast(POS.tub.x+130, POS.tub.y-30, "Brrr!"); sfx.no(); }
+    if(z==='green'){ toast(POS.tub.x+130, POS.tub.y-30, "There! Hold it!"); tone(700,.12,'sine',.12); }
+  }
+  if(z==='green'){ dialState.dwell++; if(dialState.dwell>=5) dialSuccess(); }
+  else dialState.dwell = 0;
+}
+function dialSuccess(){
+  dialState.done = true;
+  clearInterval(dialState.timer);
+  sfx.yay();
+  const card = document.getElementById('dialCard');
+  if(card){ card.classList.add('done'); setTimeout(()=>card.remove(), 900); }
+  faucetStream.classList.add('on');
+  sfx.splash();
+  instruct("Just right! Ahh!", true);
+  setTimeout(()=>{
+    water.classList.add('filled');
+    rosie.classList.add('wet','happy');
+  }, 400);
+  setTimeout(()=>{
+    faucetStream.classList.remove('on');
+    toast(POS.tub.x+130, POS.tub.y-30, "Ahh! 😊");
+    stepDone();
+    setTimeout(step3, 700);
+  }, 2100);
+}
+
+/* ---------- Step 3: shampoo sniff test + bubbles ---------- */
+const SHAMPOOS = [
+  { emoji:'🍓', name:'Strawberry', color:'c-pink',   body:'#e5566d', dark:'#b23a4e', drop:'#ff9db0' },
+  { emoji:'🥥', name:'Coconut',    color:'c-yellow', body:'#a06a42', dark:'#7c4e2c', drop:'#fff3e0' },
+  { emoji:'🌸', name:'Lily',       color:'c-purple', body:'#9a7bd0', dark:'#7458a8', drop:'#d9c8ff' },
+];
+function step3(){
+  wrongTries = 0;
+  rosie.classList.remove('happy');
+  instruct("Which shampoo does Rosie want? Tap one to sniff.");
+  clearChoices();
+  const btns = SHAMPOOS.map((s,i)=> addChoice(s.emoji, s.name, s.color, (b)=>sniff(i,b)));
+  function sniff(i, b){
+    if(i===favShampoo){
+      sfx.yay();
+      rosie.classList.add('happy');
+      floatEmoji(POS.tub.x+40, POS.tub.y-10, s(i).emoji);
+      toast(POS.tub.x+130, POS.tub.y-30, "Mmm! This one!");
+      say(`Mmm! Rosie loves ${s(i).name}!`);
+      clearChoices();
+      setTimeout(()=>shampooPhase(i), 1300);
+    } else {
+      wrongTries++;
+      sfx.no();
+      rosie.classList.add('wiggle');
+      setTimeout(()=>rosie.classList.remove('wiggle'), 600);
+      toast(POS.tub.x+130, POS.tub.y-30, "Sniff sniff... no!");
+      say("Sniff sniff... not this one! Try another.");
+      b.style.opacity = .4; b.disabled = true;
+      if(wrongTries>=2) btns[favShampoo].classList.add('correct-glow');
+    }
+  }
+  function s(i){ return SHAMPOOS[i]; }
+}
+
+/* squeeze the shampoo bottle onto Rosie */
+let squeezes = 0;
+function shampooBottleSVG(s){
+  return `<svg viewBox="0 0 86 124" style="width:86px;height:124px;">
+    <rect x="30" y="4" width="26" height="12" rx="4" fill="${s.dark}"/>
+    <rect x="24" y="14" width="38" height="13" rx="4" fill="${s.dark}"/>
+    <path d="M22 36 Q22 27 31 27 L55 27 Q64 27 64 36 L66 106 Q66 120 52 120 L34 120 Q20 120 20 106 Z" fill="${s.body}"/>
+    <rect x="21" y="56" width="44" height="34" rx="9" fill="#fff" opacity=".92"/>
+    <text x="43" y="81" font-size="22" text-anchor="middle">${s.emoji}</text>
+  </svg>`;
+}
+function shampooPhase(scentIdx){
+  squeezes = 0;
+  const s = SHAMPOOS[scentIdx];
+  instruct("Squeeze the shampoo on Rosie! Three big squeezes!");
+  const b = document.createElement('div');
+  b.id = 'shampooBottle';
+  b.className = 'hint';
+  b.innerHTML = shampooBottleSVG(s);
+  world.appendChild(b);
+  b.addEventListener('pointerdown', ()=>{
+    if(squeezes >= 3) return;
+    b.classList.remove('hint');
+    b.classList.add('squeeze');
+    setTimeout(()=>b.classList.remove('squeeze'), 250);
+    squeezes++;
+    sfx.pop();
+    sprayShampoo(s);
+    if(squeezes === 2) say("One more squeeze!");
+    if(squeezes >= 3){
+      toast(POS.tub.x+130, POS.tub.y-30, "Good squeezing!");
+      setTimeout(()=>{ b.remove(); scrubPhase(); }, 1000);
+    }
+  });
+}
+function sprayShampoo(s){
+  for(let i=0; i<4; i++){
+    const d = document.createElement('div');
+    d.className = 'sdrop';
+    d.style.background = s.drop;
+    const size = 10 + Math.random()*10;
+    d.style.width = size+'px'; d.style.height = size+'px';
+    d.style.left = '288px'; d.style.top = '288px';
+    world.appendChild(d);
+    requestAnimationFrame(()=>{
+      d.style.left = (455 + Math.random()*130)+'px';
+      d.style.top = (210 + Math.random()*85)+'px';
+      d.style.opacity = .15;
+    });
+    setTimeout(()=>d.remove(), 750);
+  }
+  setTimeout(()=>{
+    spawnBubble(440 + Math.random()*150, 195 + Math.random()*95, 20 + Math.random()*16, false);
+  }, 480);
+}
+
+let scrubCount = 0;
+function scrubPhase(){
+  scrubCount = 0;
+  instruct("Rub rub rub! Tap Rosie to make bubbles!");
+  rosie.classList.add('hint');
+  rosie.style.pointerEvents = 'auto';
+  rosie.addEventListener('pointerdown', scrubTap);
+}
+function scrubTap(ev){
+  scrubCount++;
+  sfx.pop();
+  rosie.classList.remove('hint');
+  // grow a bubble near tap
+  const p = worldPoint(ev.clientX, ev.clientY);
+  spawnBubble(p.x-20+Math.random()*40-20, p.y-30+Math.random()*20-10, 26+Math.random()*22, false);
+  rosie.classList.add('wiggle');
+  setTimeout(()=>rosie.classList.remove('wiggle'), 500);
+  if(scrubCount===3) say("Keep going! More bubbles!");
+  if(scrubCount>=6){
+    rosie.removeEventListener('pointerdown', scrubTap);
+    sfx.yay();
+    toast(POS.tub.x+130, POS.tub.y-30, "So bubbly! 🫧");
+    say("Wow! Rosie is so bubbly!");
+    stepDone();
+    setTimeout(step4, 1300);
+  }
+}
+function spawnBubble(x, y, size, tappable){
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.style.left = x+'px'; b.style.top = y+'px';
+  b.style.width = size+'px'; b.style.height = size+'px';
+  b.style.animationDelay = (Math.random()*1.5)+'s';
+  if(tappable){
+    b.addEventListener('pointerdown', ()=>{
+      if(b.classList.contains('pop')) return;
+      b.classList.add('pop');
+      sfx.pop();
+      setTimeout(()=>b.remove(), 360);
+      rinseProgress();
+    });
+  } else {
+    b.style.pointerEvents = 'none';
+  }
+  world.appendChild(b);
+  return b;
+}
+
+/* ---------- Step 4: treats she likes — and ones she doesn't! ---------- */
+const TREATS_GOOD = [ {e:'🦴', n:'Bone'}, {e:'🍖', n:'Meat'}, {e:'🥕', n:'Carrot'}, {e:'🍪', n:'Biscuit'}, {e:'🥫', n:'Dog Food'} ];
+const TREATS_BAD  = [ {e:'🍋', n:'Lemon'}, {e:'🌶️', n:'Chilli'}, {e:'🥦', n:'Broccoli'} ];
+let treatsFed = 0;
+function step4(){
+  treatsFed = 0;
+  instruct("Feed Rosie 3 treats she likes!");
+  clearChoices();
+  const all = TREATS_GOOD.map(t=>({e:t.e, n:t.n, good:true}))
+    .concat(TREATS_BAD.map(t=>({e:t.e, n:t.n, good:false})));
+  for(let i = all.length-1; i > 0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [all[i], all[j]] = [all[j], all[i]];
+  }
+  all.forEach(t=>{
+    addChoice(t.e, t.n, 'c-yellow', (b)=>{
+      if(b.disabled) return;
+      b.disabled = true;
+      if(t.good){
+        b.style.visibility = 'hidden';
+        feedTreat(t.e);
+      } else {
+        b.style.opacity = .35;
+        sfx.no();
+        rosie.classList.add('wiggle');
+        setTimeout(()=>rosie.classList.remove('wiggle'), 600);
+        toast(POS.tub.x+130, POS.tub.y-30, "Yuck! No thanks!");
+        say("Yuck! Rosie does not like that one!");
+      }
+    });
+  });
+}
+function feedTreat(emoji){
+  treatsFed++;
+  const thisTreat = treatsFed;   // so only the 3rd treat finishes the step, even with fast taps
+  // fly emoji to Rosie's mouth
+  const e = document.createElement('div');
+  e.style.cssText = 'position:absolute;z-index:25;font-size:44px;transition:left .7s ease, top .7s ease, transform .7s;pointer-events:none;';
+  e.textContent = emoji;
+  e.style.left = '380px'; e.style.top = '470px';
+  world.appendChild(e);
+  requestAnimationFrame(()=>{
+    e.style.left = (POS.tub.x+75)+'px';
+    e.style.top = (POS.tub.y+75)+'px';
+    e.style.transform = 'scale(.4)';
+  });
+  setTimeout(()=>{
+    e.remove();
+    sfx.munch();
+    rosie.classList.add('happy','wiggle');
+    setTimeout(()=>rosie.classList.remove('wiggle'), 500);
+    toast(POS.tub.x+130, POS.tub.y-30, "Nom nom!");
+    if(thisTreat===3){
+      clearChoices();
+      say("Yum! Rosie's tummy is happy. She will stay in the bath!");
+      instrText.textContent = "Yum! Rosie will stay in the bath!";
+      sfx.yay();
+      stepDone();
+      setTimeout(step5, 1600);
+    }
+  }, 750);
+}
+
+/* ---------- Step 5: rinse — pop all bubbles ---------- */
+let bubblesLeft = 0;
+function step5(){
+  rosie.classList.remove('happy');
+  instruct("Wash off all the soap! Tap the bubbles!");
+  clearChoices();
+  // spawn tappable bubbles over Rosie in tub
+  const spots = [
+    [450,180],[500,150],[555,175],[520,230],[470,240],[590,220],[430,235],[545,120]
+  ];
+  bubblesLeft = spots.length;
+  spots.forEach((sp,i)=>{
+    setTimeout(()=>spawnBubble(sp[0], sp[1], 34+Math.random()*20, true), i*90);
+  });
+  faucetStream.classList.add('on');
+  sfx.splash();
+}
+function rinseProgress(){
+  bubblesLeft--;
+  if(bubblesLeft===3) say("Nearly there! Pop the last bubbles!");
+  if(bubblesLeft<=0){
+    // clear any leftover scrub bubbles too — Rosie is properly clean
+    document.querySelectorAll('.bubble').forEach(b=>{
+      b.classList.add('pop');
+      setTimeout(()=>b.remove(), 360);
+    });
+    faucetStream.classList.remove('on');
+    sfx.yay();
+    toast(POS.tub.x+130, POS.tub.y-30, "All clean! ✨");
+    say("All the soap is gone! Rosie is so clean!");
+    instrText.textContent = "All the soap is gone!";
+    stepDone();
+    setTimeout(step6, 1500);
+  }
+}
+
+/* ---------- Step 6: blow dry — keep the dryer moving or she gets too hot! ---------- */
+let dryState = null, dryBurns = 0;
+const DRYER_SVG = `
+  <svg viewBox="0 0 110 90" style="width:110px;height:90px;overflow:visible;">
+    <rect x="8" y="30" width="28" height="20" rx="6" fill="#c8433a"/>
+    <rect x="30" y="18" width="62" height="42" rx="20" fill="#e2574c"/>
+    <circle cx="78" cy="39" r="13" fill="#f5c3bd"/>
+    <circle cx="78" cy="39" r="7" fill="#e9968e"/>
+    <rect x="48" y="55" width="20" height="32" rx="9" fill="#c8433a" transform="rotate(-12 58 71)"/>
+  </svg>`;
+function step6(){
+  water.classList.remove('filled');
+  placeRosie({x:120, y:270});
+  rosie.classList.add('shake-dry');
+  setTimeout(()=>rosie.classList.remove('shake-dry'), 800);
+  instruct("Dry Rosie! Press and move the dryer. Don't stay in one spot!");
+  clearChoices();
+  setTimeout(startDry, 900);
+}
+function startDry(){
+  dryState = {
+    zones: [], holding: false, px: 0, py: 0, active: true, wind: 0,
+    heatTime: dryBurns >= 2 ? 3.8 : 2.6,   // eases off after a couple of ouches
+  };
+  const defs = [
+    { x:150, y:275, w:130, h:112 },   // head
+    { x:122, y:392, w:96,  h:82 },    // front
+    { x:224, y:392, w:92,  h:82 },    // back
+  ];
+  defs.forEach(d=>{
+    const el = document.createElement('div');
+    el.className = 'dryzone';
+    el.style.left = d.x+'px'; el.style.top = d.y+'px';
+    el.style.width = d.w+'px'; el.style.height = d.h+'px';
+    el.innerHTML = `<div class="glow"></div><div class="ico">💧</div>`;
+    world.appendChild(el);
+    dryState.zones.push(Object.assign({}, d, {
+      dry:0, heat:0, warned:false, el, glow:el.querySelector('.glow'), ico:el.querySelector('.ico')
+    }));
+  });
+  tool.innerHTML = DRYER_SVG;
+  tool.style.display = 'block';
+  tool.style.left = '290px'; tool.style.top = '230px';
+}
+function moveDryer(){
+  tool.style.left = (dryState.px+4)+'px';
+  tool.style.top = (dryState.py-44)+'px';
+}
+function dryTick(dt){
+  const ds = dryState;
+  let over = null;
+  if(ds.holding){
+    over = ds.zones.find(z=> ds.px>=z.x && ds.px<=z.x+z.w && ds.py>=z.y && ds.py<=z.y+z.h);
+  }
+  for(const z of ds.zones){
+    if(z === over){
+      if(z.dry < 1){
+        z.dry = Math.min(1, z.dry + dt/1.4);
+        if(z.dry >= 1){ z.ico.textContent = '✨'; z.ico.style.opacity = 1; sfx.pop(); }
+      }
+      z.heat = Math.min(1.01, z.heat + dt/ds.heatTime);
+      if(z.heat >= 0.6 && !z.warned){
+        z.warned = true;
+        toast(z.x + z.w/2 - 40, z.y - 40, "Keep moving!");
+        tone(880, .16, 'sine', .12);
+      }
+      if(z.heat >= 1){ burnEvent(z); return; }
+    } else {
+      z.heat = Math.max(0, z.heat - dt/1.2);
+      if(z.heat < 0.35) z.warned = false;
+    }
+    z.glow.style.opacity = z.heat > 0.3 ? (z.heat - 0.3)/0.7 : 0;
+    if(z.dry < 1) z.ico.style.opacity = 0.35 + 0.65*(1 - z.dry);
+  }
+  if(ds.zones.every(z=>z.dry >= 1)){ dryComplete(); return; }
+  if(ds.holding && over){
+    ds.wind += dt;
+    if(ds.wind > 0.35){ ds.wind = 0; floatEmoji(ds.px - 34, ds.py - 10, '💨'); }
+  }
+}
+function burnEvent(zone){
+  dryState.active = false;
+  dryState.holding = false;
+  dryBurns++;
+  sfx.no();
+  zone.el.classList.add('burn');
+  floatEmoji(zone.x + zone.w/2, zone.y + 10, '🔥');
+  toast(zone.x + zone.w/2 - 50, zone.y - 44, "Ouch! Too hot!");
+  say("Ouch! That spot got too hot! Keep the dryer moving. Let's dry her again.");
+  rosie.classList.add('wiggle');
+  setTimeout(()=>rosie.classList.remove('wiggle'), 600);
+  setTimeout(()=>{
+    if(!dryState) return;
+    dryState.zones.forEach(z=>{
+      z.dry = 0; z.heat = 0; z.warned = false;
+      z.el.classList.remove('burn');
+      z.ico.textContent = '💧'; z.ico.style.opacity = 1;
+      z.glow.style.opacity = 0;
+    });
+    dryState.heatTime = dryBurns >= 2 ? 3.8 : 2.6;
+    dryState.active = true;
+  }, 1700);
+}
+function dryComplete(){
+  dryState.active = false;
+  dryState = null;
+  document.querySelectorAll('.dryzone').forEach(e=>e.remove());
+  tool.style.display = 'none';
+  rosie.classList.remove('wet');
+  rosie.classList.add('fluffy','happy');
+  sfx.yay();
+  toast(190, 240, "So fluffy!");
+  say("Look! Rosie is dry and so fluffy!");
+  instrText.textContent = "Rosie is dry and fluffy!";
+  stepDone();
+  setTimeout(step7, 1500);
+}
+
+/* ---------- Step 7: pour the conditioner — stop in the green! ---------- */
+let condState = null;
+function step7(){
+  rosie.classList.remove('happy');
+  instruct("Conditioner time! Hold the bottle to pour. Stop in the green!");
+  clearChoices();
+  buildCondUI();
+}
+function buildCondUI(){
+  condState = { fill: 0, holding: false, active: true, fails: 0, greenLo: .55, greenHi: .85, max: .94 };
+  const ui = document.createElement('div');
+  ui.id = 'condUI';
+  ui.innerHTML = `
+    <div id="condBottle" class="hint" style="left:350px; top:290px; width:92px; height:132px;">
+      <svg viewBox="0 0 92 132" style="width:92px;height:132px;">
+        <rect x="52" y="8" width="26" height="9" rx="4.5" fill="#c9578c"/>
+        <rect x="30" y="4" width="26" height="14" rx="7" fill="#c9578c"/>
+        <rect x="36" y="18" width="14" height="16" rx="4" fill="#d76ba0"/>
+        <rect x="16" y="34" width="56" height="92" rx="18" fill="#e78fb3"/>
+        <rect x="16" y="60" width="56" height="36" fill="#ffffff" opacity=".9"/>
+        <text x="44" y="86" font-size="22" text-anchor="middle">🐶</text>
+      </svg>
+    </div>
+    <div id="condMeter" style="left:470px; top:280px;">
+      <div id="condGreen"></div>
+      <div id="condFill"></div>
+    </div>`;
+  world.appendChild(ui);
+  const green = document.getElementById('condGreen');
+  green.style.bottom = (condState.greenLo*100)+'%';
+  green.style.height = ((condState.greenHi - condState.greenLo)*100)+'%';
+  const bottle = document.getElementById('condBottle');
+  bottle.addEventListener('pointerdown', ()=>{
+    if(!condState || !condState.active) return;
+    condState.holding = true;
+    bottle.classList.add('squeeze');
+    bottle.classList.remove('hint');
+  });
+}
+function condTick(dt){
+  const cs = condState;
+  cs.fill = Math.min(1, cs.fill + dt/2.6);
+  renderCond();
+  if(cs.fill >= cs.max) condFail();
+}
+function renderCond(){
+  const fillEl = document.getElementById('condFill');
+  if(fillEl) fillEl.style.height = (condState.fill*97)+'%';
+  let cream = document.getElementById('creamBlob');
+  if(!cream){
+    cream = document.createElement('div');
+    cream.id = 'creamBlob';
+    cream.className = 'cream';
+    world.appendChild(cream);
+  }
+  const f = condState.fill;
+  const w = 24 + f*100, h = 16 + f*44;
+  cream.style.width = w+'px'; cream.style.height = h+'px';
+  cream.style.left = (215 - w/2)+'px';
+  cream.style.top = (306 - h*0.6)+'px';
+  cream.style.opacity = f > 0.02 ? 1 : 0;
+}
+function condRelease(){
+  const cs = condState;
+  if(!cs || !cs.active || !cs.holding) return;
+  cs.holding = false;
+  const bottle = document.getElementById('condBottle');
+  if(bottle) bottle.classList.remove('squeeze');
+  if(cs.fill >= cs.greenLo && cs.fill <= cs.greenHi){
+    condSuccess();
+  } else if(cs.fill > cs.greenHi){
+    condFail();
+  } else {
+    toast(360, 250, "A little more!");
+    say("A little more!");
+  }
+}
+function condFail(){
+  const cs = condState;
+  cs.holding = false;
+  cs.fails++;
+  if(cs.fails >= 2){   // ease off: wider green zone after two misses
+    cs.greenLo = .5; cs.greenHi = .88;
+    const g = document.getElementById('condGreen');
+    if(g){ g.style.bottom = '50%'; g.style.height = '38%'; }
+  }
+  sfx.no();
+  const meter = document.getElementById('condMeter');
+  if(meter){ meter.classList.add('flash'); setTimeout(()=>meter.classList.remove('flash'), 1100); }
+  toast(360, 250, "Too much!");
+  say("Whoops! Too much conditioner! Wash it off and try again.");
+  const bottle = document.getElementById('condBottle');
+  if(bottle) bottle.classList.remove('squeeze');
+  cs.fill = 0;
+  renderCond();
+}
+function condSuccess(){
+  condState.active = false;
+  condState = null;
+  sfx.yay();
+  toast(360, 250, "Perfect!");
+  say("Perfect! Now brush out the knots. Tap each knot!");
+  instrText.textContent = "Brush out the knots! Tap each knot.";
+  const ui = document.getElementById('condUI');
+  if(ui) ui.remove();
+  const cream = document.getElementById('creamBlob');
+  if(cream){ cream.style.opacity = 0; setTimeout(()=>cream.remove(), 700); }
+  setTimeout(brushPhase, 900);
+}
+let knotsLeft = 0;
+function knotSVG(i){
+  // a tangled ball of Rosie's fur — messy loops + stray hairs sticking out
+  const rot = [-14, 10, -6, 18][i % 4];
+  return `
+  <svg viewBox="0 0 48 48" style="transform:rotate(${rot}deg)">
+    <circle cx="24" cy="26" r="20" fill="rgba(255,246,236,.6)"/>
+    <g fill="none" stroke-linecap="round">
+      <path d="M10 30 C 6 18 20 8 28 13 C 38 19 41 33 31 38 C 21 43 12 37 14 27 C 16 17 32 15 34 26 C 36 35 25 40 18 34"
+            stroke="#6B3D18" stroke-width="5.5"/>
+      <path d="M9 24 C 15 13 33 11 38 23 C 41 31 34 39 25 38" stroke="#93582A" stroke-width="4" opacity=".85"/>
+      <path d="M16 32 C 12 24 20 16 28 19" stroke="#B06A33" stroke-width="3" opacity=".8"/>
+      <path d="M7 20 q -5 -4 -4 -9" stroke="#6B3D18" stroke-width="3"/>
+      <path d="M39 17 q 4 -5 2 -10" stroke="#6B3D18" stroke-width="3"/>
+      <path d="M37 38 q 5 3 9 1" stroke="#6B3D18" stroke-width="3"/>
+      <path d="M12 39 q -3 5 -8 5" stroke="#93582A" stroke-width="3"/>
+    </g>
+  </svg>`;
+}
+function brushPhase(){
+  tool.textContent = '🪮';
+  tool.style.display = 'block';
+  tool.style.left = '260px'; tool.style.top = '300px';
+  const spots = [[110,300],[190,300],[150,390],[220,380]];
+  knotsLeft = spots.length;
+  spots.forEach((sp,i)=>{
+    const k = document.createElement('div');
+    k.className = 'knot';
+    k.innerHTML = knotSVG(i);
+    k.style.left = sp[0]+'px'; k.style.top = sp[1]+'px';
+    k.style.animationDelay = (i*0.3)+'s';
+    k.addEventListener('pointerdown', ()=>{
+      if(k.classList.contains('gone')) return;
+      k.classList.add('gone');
+      sfx.pop();
+      tool.style.left = (sp[0]+40)+'px'; tool.style.top = (sp[1]-30)+'px';
+      floatEmoji(sp[0], sp[1]-16, '✨');
+      setTimeout(()=>k.remove(), 400);
+      knotsLeft--;
+      if(knotsLeft<=0) finishBath();
+    });
+    world.appendChild(k);
+  });
+}
+
+/* ---------- Finish ---------- */
+function finishBath(){
+  tool.style.display = 'none';
+  rosie.classList.add('sparkly','happy');
+  stepDone();
+  const bonus = 15;
+  addCoins(bonus);
+  S.baths++; save();
+  confettiBurst();
+  sfx.yay();
+  const total = stepCoins + bonus;
+  document.getElementById('winCoinAmt').textContent = total;
+  instrText.textContent = "You did it! Rosie is clean and fluffy!";
+  say("You did it! Rosie is clean and fluffy! You earned " + total + " coins! Great job!");
+  setTimeout(()=>{ showOverlay('winOverlay'); }, 1600);
+}
+
+/* ================= Overlays ================= */
+function showOverlay(id){ document.getElementById(id).classList.add('show'); }
+function hideOverlay(id){ document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.closeX').forEach(b=>{
+  b.addEventListener('click', ()=>hideOverlay(b.dataset.close));
+});
+
+/* ---------- Prize shop ---------- */
+const PRIZES = [
+  { key:'card', icon:'🃏', name:'Pokémon card' },
+  { key:'pack', icon:'🎴', name:'Pokémon pack' },
+];
+function renderShop(){
+  renderCoins();
+  const box = document.getElementById('shopItems');
+  box.innerHTML = '';
+  PRIZES.forEach(p=>{
+    const price = S.prices[p.key];
+    const item = document.createElement('div');
+    item.className = 'shop-item';
+    item.innerHTML = `<div class="icon">${p.icon}</div>
+      <div class="info"><div class="name">${p.name}</div><div class="price">🪙 ${price} coins</div></div>`;
+    const btn = document.createElement('button');
+    btn.className = 'buyBtn';
+    btn.textContent = S.coins>=price ? 'Buy!' : 'Save up!';
+    btn.disabled = S.coins < price;
+    btn.addEventListener('click', ()=>{
+      if(S.coins < price) return;
+      S.coins -= price;
+      S.owed.push({ name:p.name, icon:p.icon, when:new Date().toLocaleDateString() });
+      save();
+      sfx.yay();
+      say(`You bought a ${p.name}! Show Mum or Dad to collect it!`);
+      renderShop();
+    });
+    item.appendChild(btn);
+    box.appendChild(item);
+  });
+  // owed list
+  const owedSec = document.getElementById('owedSection');
+  const owedList = document.getElementById('owedListShop');
+  if(S.owed.length){
+    owedSec.style.display = '';
+    owedList.innerHTML = S.owed.map(o=>`<div class="owed">${o.icon} ${o.name} <span class="muted">(${o.when})</span></div>`).join('');
+  } else owedSec.style.display = 'none';
+}
+document.getElementById('shopBtn').addEventListener('click', ()=>{ renderShop(); showOverlay('shopOverlay'); });
+document.getElementById('winShop').addEventListener('click', ()=>{
+  hideOverlay('winOverlay'); renderShop(); showOverlay('shopOverlay');
+});
+document.getElementById('winAgain').addEventListener('click', ()=>{
+  hideOverlay('winOverlay'); startBath();
+});
+
+/* ---------- Grown-ups ---------- */
+let gateAnswer = 0;
+function newGate(){
+  const a = 2+Math.floor(Math.random()*10), b = 2+Math.floor(Math.random()*10);
+  gateAnswer = a*b;
+  document.getElementById('gateQ').textContent = `What is ${a} × ${b}?`;
+  document.getElementById('gateInput').value = '';
+}
+document.getElementById('grownBtn').addEventListener('click', ()=>{
+  newGate();
+  document.getElementById('gateBox').style.display = '';
+  document.getElementById('grownBox').style.display = 'none';
+  showOverlay('grownOverlay');
+});
+document.getElementById('gateGo').addEventListener('click', ()=>{
+  if(parseInt(document.getElementById('gateInput').value,10)===gateAnswer){
+    document.getElementById('gateBox').style.display = 'none';
+    document.getElementById('grownBox').style.display = '';
+    renderGrown();
+  } else {
+    newGate();
+  }
+});
+function renderGrown(){
+  document.getElementById('priceCard').value = S.prices.card;
+  document.getElementById('pricePack').value = S.prices.pack;
+  document.getElementById('setCoins').value = S.coins;
+  document.getElementById('bathCount').textContent = S.baths;
+  const list = document.getElementById('owedListGrown');
+  if(!S.owed.length){ list.textContent = 'None yet.'; list.className='muted'; return; }
+  list.className = '';
+  list.innerHTML = '';
+  S.owed.forEach((o,i)=>{
+    const row = document.createElement('div');
+    row.className = 'owed';
+    row.innerHTML = `${o.icon} ${o.name} <span class="muted">(${o.when})</span>`;
+    const done = document.createElement('button');
+    done.textContent = 'Given ✓';
+    done.addEventListener('click', ()=>{ S.owed.splice(i,1); save(); renderGrown(); });
+    row.appendChild(done);
+    list.appendChild(row);
+  });
+}
+document.getElementById('savePrices').addEventListener('click', ()=>{
+  const c = parseInt(document.getElementById('priceCard').value,10);
+  const p = parseInt(document.getElementById('pricePack').value,10);
+  if(c>0) S.prices.card = c;
+  if(p>0) S.prices.pack = p;
+  save();
+  say('Prices saved.', false);
+});
+document.getElementById('applyCoins').addEventListener('click', ()=>{
+  const v = parseInt(document.getElementById('setCoins').value,10);
+  if(!isNaN(v) && v>=0){ S.coins = v; save(); renderCoins(); }
+});
+document.getElementById('makeBackup').addEventListener('click', ()=>{
+  const code = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+  document.getElementById('backupCode').value = code;
+});
+document.getElementById('copyBackup').addEventListener('click', ()=>{
+  const ta = document.getElementById('backupCode');
+  if(!ta.value) return;
+  ta.select(); ta.setSelectionRange(0, 999999);
+  try { document.execCommand('copy'); } catch(e){}
+  if(navigator.clipboard) navigator.clipboard.writeText(ta.value).catch(()=>{});
+});
+document.getElementById('doRestore').addEventListener('click', ()=>{
+  const code = document.getElementById('restoreCode').value.trim();
+  if(!code) return;
+  try {
+    const d = JSON.parse(decodeURIComponent(escape(atob(code))));
+    if(typeof d.coins !== 'number') throw new Error('bad');
+    S = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), d,
+      { prices: Object.assign({}, DEFAULTS.prices, d.prices||{}) });
+    save(); renderCoins(); renderGrown();
+    alert('Restored! ✅');
+  } catch(e){ alert('That code did not work. Check it and try again.'); }
+});
+document.getElementById('resetAll').addEventListener('click', ()=>{
+  if(confirm('Reset ALL progress, coins and prizes?')){
+    S = JSON.parse(JSON.stringify(DEFAULTS));
+    save(); renderCoins();
+    hideOverlay('grownOverlay');
+    startBath();
+  }
+});
+
+/* ================= Shared game loop + pointer tracking ================= */
+function gameTick(ts){
+  const dt = Math.min(0.05, (ts - (gameTick.last || ts))/1000);
+  gameTick.last = ts;
+  if(dryState && dryState.active) dryTick(dt);
+  if(condState && condState.active && condState.holding) condTick(dt);
+  requestAnimationFrame(gameTick);
+}
+requestAnimationFrame(gameTick);
+
+world.addEventListener('pointerdown', (ev)=>{
+  if(dryState && dryState.active){
+    dryState.holding = true;
+    const p = worldPoint(ev.clientX, ev.clientY);
+    dryState.px = p.x; dryState.py = p.y;
+    moveDryer();
+  }
+});
+world.addEventListener('pointermove', (ev)=>{
+  if(dryState && dryState.active && dryState.holding){
+    const p = worldPoint(ev.clientX, ev.clientY);
+    dryState.px = p.x; dryState.py = p.y;
+    moveDryer();
+  }
+});
+window.addEventListener('pointerup', ()=>{
+  if(dryState) dryState.holding = false;
+  condRelease();
+});
+window.addEventListener('pointercancel', ()=>{
+  if(dryState) dryState.holding = false;
+  condRelease();
+});
+
+/* ================= Boot ================= */
+fitWorld();
+renderCoins();
+// warm up audio on first touch (iOS requirement)
+document.body.addEventListener('pointerdown', function once(){
+  ac();
+  document.body.removeEventListener('pointerdown', once);
+}, { once:true });
+startBath();
+</script>
+</body>
+</html>
