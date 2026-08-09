@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Rosie's Bath">
-<title>Rosie's Bath Time 🛁</title>
+<title>Rosie's World 🐶</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html, body { height:100%; overflow:hidden; }
@@ -255,6 +255,32 @@
   .choice.correct-glow { animation: glow 1s ease-in-out infinite; }
   @keyframes glow { 0%,100%{box-shadow:0 5px 0 rgba(0,0,0,.15)} 50%{box-shadow:0 5px 0 rgba(0,0,0,.15), 0 0 24px 6px #ffd44d} }
 
+  /* ---------- Park: find Oscar & Ollie ---------- */
+  #rosie.no-trans { transition:none; }
+  #parkScene { position:absolute; left:0; top:0; width:800px; height:520px; display:none; z-index:1; }
+  #world.park-mode #parkScene { display:block; }
+  #world.park-mode .tile-wall, #world.park-mode .floor, #world.park-mode .window, #world.park-mode #tubWrap { display:none; }
+  .park-bg { position:absolute; left:-200px; right:-200px; top:-120px; bottom:-120px; overflow:hidden; }
+  .park-sky { position:absolute; left:0; right:0; top:0; height:290px; background:linear-gradient(#a5dcf7,#dff4ff); }
+  .park-sun { position:absolute; right:130px; top:26px; font-size:54px; }
+  .park-grass { position:absolute; left:0; right:0; top:290px; bottom:0; background:linear-gradient(#93cf72,#7cbb5e); }
+  .park-path { position:absolute; left:0; right:0; top:440px; height:70px;
+    background:repeating-linear-gradient(90deg,#ddd3c2 0 70px,#d2c6b2 70px 140px);
+    box-shadow: inset 0 5px 0 rgba(0,0,0,.07), inset 0 -5px 0 rgba(0,0,0,.07); }
+  .park-tree { position:absolute; font-size:84px; filter:drop-shadow(0 6px 4px rgba(0,0,0,.12)); }
+  .bush { position:absolute; width:120px; height:90px; cursor:pointer; z-index:3; }
+  .bush svg { width:100%; height:100%; overflow:visible; filter:drop-shadow(0 4px 4px rgba(0,0,0,.15)); }
+  .bush.rustle { animation: wiggle .45s ease 2; }
+  .bush.searched { opacity:.75; filter:saturate(.65); }
+  .poo { position:absolute; font-size:32px; z-index:2; filter:drop-shadow(0 2px 2px rgba(0,0,0,.15)); }
+  #cyclist { position:absolute; font-size:62px; z-index:6; filter:drop-shadow(0 4px 4px rgba(0,0,0,.18)); }
+  #bigdog { position:absolute; font-size:84px; z-index:5; filter:drop-shadow(0 5px 5px rgba(0,0,0,.18)); }
+  .friendWrap { position:absolute; width:96px; height:110px; z-index:5; animation: poppin .5s ease; }
+  @keyframes poppin { 0%{transform:scale(0)} 70%{transform:scale(1.15)} 100%{transform:scale(1)} }
+  .friendWrap .fname { position:absolute; left:50%; top:-24px; transform:translateX(-50%);
+    background:#fff; color:#4a3a28; font-weight:800; font-size:17px; padding:3px 12px; border-radius:12px;
+    box-shadow:0 2px 6px rgba(0,0,0,.15); white-space:nowrap; }
+
   /* ---------- Overlays (shop / grown-ups / win) ---------- */
   .overlay {
     position:fixed; inset:0; background:rgba(40,60,80,.45); z-index:100;
@@ -307,8 +333,9 @@
 
 <div id="topbar">
   <div class="pill" id="coinPill">🪙 <span id="coinCount">0</span></div>
-  <div class="pill" style="font-size:17px;">🛁 Rosie's Bath Time</div>
+  <div class="pill" style="font-size:17px;">🐶 Rosie's World</div>
   <div class="spacer"></div>
+  <button class="pill" id="homeBtn" aria-label="Menu">🏠</button>
   <button class="pill" id="shopBtn">🎁 Shop</button>
   <button class="pill" id="grownBtn" style="font-size:16px;">👨‍👩‍👦 Grown-ups</button>
 </div>
@@ -333,6 +360,18 @@
       <div id="faucetStream"></div>
     </div>
 
+    <div id="parkScene">
+      <div class="park-bg">
+        <div class="park-sky"></div>
+        <div class="park-sun">☀️</div>
+        <div class="park-grass"></div>
+        <div class="park-path"></div>
+        <div class="park-tree" style="left:60px; top:170px;">🌳</div>
+        <div class="park-tree" style="left:450px; top:158px;">🌳</div>
+        <div class="park-tree" style="left:890px; top:172px;">🌲</div>
+        <div class="park-tree" style="right:70px; top:185px;">🌳</div>
+      </div>
+    </div>
     <div id="rosie"></div>
     <div id="tool"></div>
   </div>
@@ -412,13 +451,27 @@
 <!-- ===== Win screen ===== -->
 <div class="overlay" id="winOverlay">
   <div class="panel" id="winPanel">
-    <div class="bigdog">🐶✨</div>
-    <h2>You gave Rosie a bath!</h2>
-    <div style="font-size:20px; color:#666; font-weight:700;">She is clean and fluffy. Good job!</div>
+    <div class="bigdog" id="winEmoji">🐶✨</div>
+    <h2 id="winTitle">You did it!</h2>
+    <div id="winSub" style="font-size:20px; color:#666; font-weight:700;">Good job!</div>
     <div id="winCoins">+ 🪙 <span id="winCoinAmt">0</span> coins!</div>
     <div class="winBtns">
       <button class="choice c-yellow" id="winShop"><span class="big">🎁</span>Prize Shop</button>
-      <button class="choice c-green" id="winAgain"><span class="big">🛁</span>Wash again!</button>
+      <button class="choice c-green" id="winAgain"><span class="big">🛁</span>Again!</button>
+      <button class="choice c-blue" id="winMenu"><span class="big">🏠</span>Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Menu ===== -->
+<div class="overlay" id="menuOverlay">
+  <div class="panel" style="text-align:center;">
+    <div style="font-size:60px;">🐶</div>
+    <h2 style="justify-content:center;">Rosie's World</h2>
+    <div class="muted" style="font-size:18px; margin-bottom:10px;">What will Rosie do today?</div>
+    <div class="winBtns">
+      <button class="choice c-blue" id="menuBath"><span class="big">🛁</span>Bath time</button>
+      <button class="choice c-green" id="menuPark"><span class="big">🌳</span>Park friends</button>
     </div>
   </div>
 </div>
@@ -638,21 +691,27 @@ function stepDone(bonusText){
   if(bonusText) toast(POS.tub.x+40, POS.tub.y-40, bonusText);
 }
 
-function startBath(){
-  stepCoins = 0;
-  wrongTries = 0;
-  favShampoo = Math.floor(Math.random()*3);
+function resetScene(){
   water.classList.remove('filled');
   faucetStream.classList.remove('on');
   rosie.className = '';
   rosie.style.display = '';
-  placeRosie(POS.start);
   clearChoices();
-  document.querySelectorAll('.bubble,.knot,.dryzone,.cream,.sdrop,#dialCard,#condUI,#shampooBottle').forEach(e=>e.remove());
+  document.querySelectorAll('.bubble,.knot,.dryzone,.cream,.sdrop,.parkItem,.toast-bubble,#dialCard,#condUI,#shampooBottle').forEach(e=>e.remove());
   if(dialState){ clearInterval(dialState.timer); dialState = null; }
   if(dryState){ dryState.active = false; dryState = null; }
   condState = null;
+  parkState = null;
   tool.style.display = 'none';
+  world.classList.remove('park-mode');
+}
+function startBath(){
+  lastMode = 'bath';
+  resetScene();
+  stepCoins = 0;
+  wrongTries = 0;
+  favShampoo = Math.floor(Math.random()*3);
+  placeRosie(POS.start);
   step1();
 }
 
@@ -1332,10 +1391,227 @@ function finishBath(){
   confettiBurst();
   sfx.yay();
   const total = stepCoins + bonus;
-  document.getElementById('winCoinAmt').textContent = total;
   instrText.textContent = "You did it! Rosie is clean and fluffy!";
   say("You did it! Rosie is clean and fluffy! You earned " + total + " coins! Great job!");
-  setTimeout(()=>{ showOverlay('winOverlay'); }, 1600);
+  setTimeout(()=>{ showWin('🐶✨','You gave Rosie a bath!','She is clean and fluffy. Good job!', total, '🛁','Wash again!'); }, 1600);
+}
+function showWin(emoji, title, sub, total, againEmoji, againLabel){
+  document.getElementById('winEmoji').textContent = emoji;
+  document.getElementById('winTitle').textContent = title;
+  document.getElementById('winSub').textContent = sub;
+  document.getElementById('winCoinAmt').textContent = total;
+  document.getElementById('winAgain').innerHTML = `<span class="big">${againEmoji}</span>${againLabel}`;
+  showOverlay('winOverlay');
+}
+
+/* ================= Park: find Oscar & Ollie ================= */
+let parkState = null, lastMode = 'bath';
+const FRIENDS = [
+  { name:'Oscar', main:'#D9A648', dark:'#B58324' },
+  { name:'Ollie', main:'#7A7A7A', dark:'#565656' },
+];
+function friendSVG(f){
+  return `<svg viewBox="0 0 100 100" style="width:96px;height:96px;overflow:visible;">
+    <ellipse cx="50" cy="80" rx="27" ry="16" fill="${f.main}"/>
+    <circle cx="34" cy="28" r="10" fill="${f.main}"/><circle cx="50" cy="24" r="12" fill="${f.main}"/><circle cx="66" cy="28" r="10" fill="${f.main}"/>
+    <circle cx="50" cy="44" r="25" fill="${f.main}"/>
+    <ellipse cx="26" cy="50" rx="9" ry="17" fill="${f.dark}" transform="rotate(12 26 50)"/>
+    <ellipse cx="74" cy="50" rx="9" ry="17" fill="${f.dark}" transform="rotate(-12 74 50)"/>
+    <circle cx="42" cy="42" r="4.5" fill="#241505"/><circle cx="58" cy="42" r="4.5" fill="#241505"/>
+    <circle cx="43.5" cy="40.5" r="1.5" fill="#fff"/><circle cx="59.5" cy="40.5" r="1.5" fill="#fff"/>
+    <ellipse cx="50" cy="52" rx="5.5" ry="4.5" fill="#181410"/>
+    <path d="M50 56 q0 4 -4 5 M50 56 q0 4 4 5" stroke="#3a2a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="50" cy="64" rx="4.5" ry="5.5" fill="#f2889b"/>
+  </svg>`;
+}
+function bushSVG(){
+  return `<svg viewBox="0 0 120 90">
+    <circle cx="30" cy="60" r="28" fill="#4f9c44"/>
+    <circle cx="92" cy="60" r="26" fill="#4f9c44"/>
+    <circle cx="60" cy="45" r="32" fill="#5cae4f"/>
+    <circle cx="60" cy="68" r="30" fill="#57a44a"/>
+    <circle cx="44" cy="38" r="6" fill="#7fcf6f"/>
+    <circle cx="76" cy="40" r="5" fill="#7fcf6f"/>
+  </svg>`;
+}
+function startPark(){
+  lastMode = 'park';
+  resetScene();
+  world.classList.add('park-mode');
+  rosie.classList.add('no-trans');
+  placeRosie({x:-20, y:330});
+  parkState = {
+    active:true, target:null, onArrive:null, bushes:[], poos:[], found:0, hits:0, cooldown:0, pooR:45,
+    cyclist:{ x:-90, wait:2.5, speed:150 },
+    dog:{ x:350, dir:1, min:330, max:560, radius:80 },
+  };
+  const scene = document.getElementById('parkScene');
+  const spots = [ {x:60,y:185},{x:320,y:172},{x:590,y:188},{x:120,y:405},{x:420,y:418},{x:650,y:400} ];
+  const a = Math.floor(Math.random()*spots.length);
+  let b = Math.floor(Math.random()*spots.length);
+  while(b===a) b = Math.floor(Math.random()*spots.length);
+  spots.forEach((sp,i)=>{
+    const el = document.createElement('div');
+    el.className = 'bush parkItem';
+    el.style.left = sp.x+'px'; el.style.top = sp.y+'px';
+    el.innerHTML = bushSVG();
+    scene.appendChild(el);
+    const bush = { x:sp.x, y:sp.y, el, searched:false, friend: i===a ? 0 : (i===b ? 1 : null) };
+    el.addEventListener('pointerdown', (ev)=>{ ev.stopPropagation(); tapBush(bush); });
+    parkState.bushes.push(bush);
+  });
+  const pooCands = [ {x:260,y:265},{x:540,y:258},{x:250,y:430},{x:390,y:470},{x:620,y:455},{x:300,y:480} ];
+  for(let i=pooCands.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [pooCands[i],pooCands[j]]=[pooCands[j],pooCands[i]]; }
+  pooCands.slice(0,4).forEach(p=>{
+    const el = document.createElement('div');
+    el.className = 'poo parkItem';
+    el.textContent = '💩';
+    el.style.left = (p.x-16)+'px'; el.style.top = (p.y-18)+'px';
+    scene.appendChild(el);
+    parkState.poos.push(p);
+  });
+  const cy = document.createElement('div');
+  cy.id = 'cyclist'; cy.className = 'parkItem'; cy.textContent = '🚴';
+  cy.style.top = '325px'; cy.style.left = '-90px'; cy.style.transform = 'scaleX(-1)';
+  scene.appendChild(cy);
+  const bd = document.createElement('div');
+  bd.id = 'bigdog'; bd.className = 'parkItem'; bd.textContent = '🐕';
+  bd.style.top = '215px'; bd.style.left = '350px';
+  scene.appendChild(bd);
+  instruct("Find Rosie's friends Oscar and Ollie! Tap a bush to look.");
+  setTimeout(()=>{ if(parkState) say("Watch out for poo, bikes and big dogs!"); }, 4500);
+}
+function rosieCenter(){ return { x:(parseFloat(rosie.style.left)||0)+95, y:(parseFloat(rosie.style.top)||0)+120 }; }
+function parkWalkTo(cx, cy, onArrive){
+  if(!parkState || !parkState.active) return;
+  parkState.target = { x: Math.max(50, Math.min(750, cx)), y: Math.max(235, Math.min(485, cy)) };
+  parkState.onArrive = onArrive || null;
+}
+function tapBush(bush){
+  if(!parkState || !parkState.active || bush.searched) return;
+  parkWalkTo(bush.x+60, bush.y+115, ()=>revealBush(bush));
+}
+function revealBush(bush){
+  if(bush.searched) return;
+  bush.searched = true;
+  bush.el.classList.add('rustle');
+  sfx.pop();
+  setTimeout(()=>{
+    if(!parkState) return;
+    bush.el.classList.remove('rustle');
+    bush.el.classList.add('searched');
+    if(bush.friend !== null){
+      const f = FRIENDS[bush.friend];
+      const el = document.createElement('div');
+      el.className = 'friendWrap parkItem';
+      el.innerHTML = `<div class="fname">${f.name}</div>` + friendSVG(f);
+      el.style.left = (bush.x+14)+'px'; el.style.top = (bush.y-6)+'px';
+      document.getElementById('parkScene').appendChild(el);
+      sfx.yay();
+      addCoins(10);
+      parkState.found++;
+      rosie.classList.add('happy');
+      setTimeout(()=>rosie.classList.remove('happy'), 1800);
+      floatEmoji(bush.x+60, bush.y-20, '💛');
+      if(parkState.found >= 2){
+        parkWin();
+      } else {
+        instruct(`You found ${f.name}! Find 1 more friend!`);
+      }
+    } else {
+      floatEmoji(bush.x+60, bush.y-14, ['🦋','🐦','🍃'][Math.floor(Math.random()*3)]);
+      say("No one here. Keep looking!");
+    }
+  }, 700);
+}
+function parkWin(){
+  parkState.active = false;
+  rosie.classList.add('sparkly','happy');
+  addCoins(10);
+  confettiBurst();
+  sfx.yay();
+  instrText.textContent = "You found Oscar and Ollie!";
+  say("Hooray! You found Oscar and Ollie! Rosie is so happy! You earned 30 coins!");
+  setTimeout(()=>showWin('🐶🐶🐶','You found Oscar and Ollie!','Rosie loves playing with her friends!',30,'🌳','Play again!'), 1700);
+}
+function parkHazard(kind, hx, hy){
+  const ps = parkState;
+  ps.cooldown = 1.6;
+  ps.hits++;
+  ps.target = null; ps.onArrive = null;
+  sfx.no();
+  rosie.classList.add('wiggle');
+  setTimeout(()=>rosie.classList.remove('wiggle'), 600);
+  const c = rosieCenter();
+  let dx = c.x-hx, dy = c.y-hy;
+  const len = Math.hypot(dx,dy) || 1; dx/=len; dy/=len;
+  const nx = Math.max(50, Math.min(750, c.x + dx*120));
+  const ny = Math.max(235, Math.min(485, c.y + dy*120));
+  rosie.classList.remove('no-trans');   // bounce back with a smooth hop
+  placeRosie({x:nx-95, y:ny-120});
+  setTimeout(()=>{ if(parkState) rosie.classList.add('no-trans'); }, 700);
+  if(kind==='poo'){ toast(hx-40, hy-60, "Ewww! Poo!"); say("Ewww! Watch out for the poo!"); floatEmoji(hx, hy-24, '🤢'); }
+  if(kind==='bike'){ toast(hx-40, hy-80, "Ding ding!"); say("Ding ding! Watch out for the bike!"); }
+  if(kind==='dog'){ toast(hx-50, hy-80, "Woof! Woof!"); say("Woah! That dog is too big! Go around him!"); }
+  if(ps.hits === 3){
+    ps.cyclist.speed = 110; ps.dog.radius = 60; ps.pooR = 38;   // ease off
+    setTimeout(()=>{ if(parkState) say("You can do it! Walk slowly and look carefully."); }, 2000);
+  }
+}
+function parkTick(dt){
+  const ps = parkState;
+  if(ps.cooldown > 0) ps.cooldown -= dt;
+  // Rosie walks toward the tap target
+  if(ps.active && ps.target){
+    const c = rosieCenter();
+    const dx = ps.target.x-c.x, dy = ps.target.y-c.y;
+    const dist = Math.hypot(dx,dy);
+    if(dist < 8){
+      ps.target = null;
+      const cb = ps.onArrive; ps.onArrive = null;
+      if(cb) cb();
+    } else {
+      const step = Math.min(dist, 175*dt);
+      const nx = c.x + dx/dist*step, ny = c.y + dy/dist*step;
+      placeRosie({x:nx-95, y:ny-120});
+      if(ps.cooldown <= 0){
+        for(const p of ps.poos){
+          if(Math.hypot(nx-p.x, ny-p.y) < ps.pooR){ parkHazard('poo', p.x, p.y); return; }
+        }
+      }
+    }
+  }
+  // cyclist crosses the bike path
+  const cyEl = document.getElementById('cyclist');
+  if(cyEl){
+    const c2 = ps.cyclist;
+    if(c2.wait > 0){
+      c2.wait -= dt;
+      if(c2.wait <= 0){ c2.x = -90; toast(30, 300, "🔔 Ding ding!"); tone(1200,.12,'sine',.1); tone(1500,.14,'sine',.1,.13); }
+    } else {
+      c2.x += c2.speed*dt;
+      if(c2.x > 900) c2.wait = 3.5 + Math.random()*3;
+      cyEl.style.left = c2.x+'px';
+      if(ps.active && ps.cooldown <= 0){
+        const c = rosieCenter();
+        if(Math.abs(c.y-355) < 62 && Math.abs(c.x-(c2.x+31)) < 70) parkHazard('bike', c2.x+31, 355);
+      }
+    }
+  }
+  // big dog patrols the top grass
+  const bdEl = document.getElementById('bigdog');
+  if(bdEl){
+    const d = ps.dog;
+    d.x += d.dir*38*dt;
+    if(d.x > d.max) d.dir = -1;
+    if(d.x < d.min) d.dir = 1;
+    bdEl.style.left = d.x+'px';
+    bdEl.style.transform = d.dir > 0 ? 'scaleX(-1)' : 'scaleX(1)';
+    if(ps.active && ps.cooldown <= 0){
+      const c = rosieCenter();
+      if(Math.hypot(c.x-(d.x+42), c.y-265) < d.radius) parkHazard('dog', d.x+42, 265);
+    }
+  }
 }
 
 /* ================= Overlays ================= */
@@ -1389,8 +1665,25 @@ document.getElementById('winShop').addEventListener('click', ()=>{
   hideOverlay('winOverlay'); renderShop(); showOverlay('shopOverlay');
 });
 document.getElementById('winAgain').addEventListener('click', ()=>{
-  hideOverlay('winOverlay'); startBath();
+  hideOverlay('winOverlay');
+  if(lastMode === 'park') startPark(); else startBath();
 });
+document.getElementById('winMenu').addEventListener('click', ()=>{
+  hideOverlay('winOverlay'); showMenu();
+});
+document.getElementById('homeBtn').addEventListener('click', ()=>{
+  ['winOverlay','shopOverlay','grownOverlay'].forEach(hideOverlay);
+  showMenu();
+});
+function showMenu(){
+  resetScene();
+  placeRosie(POS.start);
+  instrText.textContent = "What will Rosie do today?";
+  lastSpoken = "What will Rosie do today?";
+  showOverlay('menuOverlay');
+}
+document.getElementById('menuBath').addEventListener('click', ()=>{ hideOverlay('menuOverlay'); startBath(); });
+document.getElementById('menuPark').addEventListener('click', ()=>{ hideOverlay('menuOverlay'); startPark(); });
 
 /* ---------- Grown-ups ---------- */
 let gateAnswer = 0;
@@ -1485,11 +1778,17 @@ function gameTick(ts){
   gameTick.last = ts;
   if(dryState && dryState.active) dryTick(dt);
   if(condState && condState.active && condState.holding) condTick(dt);
+  if(parkState) parkTick(dt);
   requestAnimationFrame(gameTick);
 }
 requestAnimationFrame(gameTick);
 
 world.addEventListener('pointerdown', (ev)=>{
+  if(parkState && parkState.active){
+    const p = worldPoint(ev.clientX, ev.clientY);
+    parkWalkTo(p.x, p.y, null);
+    return;
+  }
   if(dryState && dryState.active){
     dryState.holding = true;
     const p = worldPoint(ev.clientX, ev.clientY);
@@ -1521,7 +1820,7 @@ document.body.addEventListener('pointerdown', function once(){
   ac();
   document.body.removeEventListener('pointerdown', once);
 }, { once:true });
-startBath();
+showMenu();
 </script>
 </body>
 </html>
