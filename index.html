@@ -34,7 +34,6 @@
     display:flex; align-items:center; gap:6px;
   }
   button.pill:active { transform: translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,.12); }
-  #coinPill { color:#8a6d00; }
 
   /* ---------- Stage / world ---------- */
   #stage { flex:1; position:relative; overflow:hidden; touch-action:none; }
@@ -257,37 +256,44 @@
 
   /* ---------- Park maze: find Oscar & Ollie ---------- */
   #rosie.no-trans { transition:none; }
-  #rosie.mini { width:64px; height:68px; z-index:6; transition:left .22s ease, top .22s ease; }
+  #rosie.mini { width:54px; height:58px; z-index:6; transition:left .22s ease, top .22s ease; }
   #parkScene { position:absolute; left:0; top:0; width:800px; height:520px; display:none; z-index:1; }
   #world.park-mode #parkScene { display:block; }
   #world.park-mode .tile-wall, #world.park-mode .floor, #world.park-mode .window, #world.park-mode #tubWrap { display:none; }
   .park-bg { position:absolute; left:-200px; right:-200px; top:-120px; bottom:-120px; overflow:hidden; }
   .park-grass { position:absolute; inset:0; background:linear-gradient(#93cf72,#7cbb5e); }
   .park-tree { position:absolute; font-size:76px; filter:drop-shadow(0 6px 4px rgba(0,0,0,.12)); }
-  .mzpath { position:absolute; width:64px; height:64px; z-index:1;
+  .mzpath { position:absolute; width:56px; height:56px; z-index:1;
     background:#f0e4c0; box-shadow: inset 0 0 0 2px #e4d5a8; }
-  .mzwall { position:absolute; width:64px; height:64px; z-index:2; border-radius:14px;
+  .mzwall { position:absolute; width:56px; height:56px; z-index:2; border-radius:13px;
     background: radial-gradient(circle at 32% 28%, #5cae4f, #3f8a37);
     box-shadow: inset 0 -6px 0 rgba(0,0,0,.15), inset 0 4px 0 rgba(255,255,255,.14); }
-  .mzpond { position:absolute; width:64px; height:64px; z-index:2; border-radius:16px;
+  .mzpond { position:absolute; width:56px; height:56px; z-index:2; border-radius:14px;
     background: radial-gradient(circle at 35% 30%, #a6dcf6, #58b1de);
     box-shadow: inset 0 -4px 0 rgba(0,0,0,.12), inset 0 3px 0 rgba(255,255,255,.35); }
-  .mzpond .duck { position:absolute; left:14px; top:8px; font-size:30px; animation: bob 2.4s ease-in-out infinite; }
-  .mzpoo { position:absolute; width:64px; height:64px; z-index:3; font-size:30px;
+  .duck { position:absolute; z-index:6; font-size:30px; pointer-events:none;
+    transition: left .45s ease, top .45s ease;
+    filter:drop-shadow(0 2px 2px rgba(0,0,0,.2)); animation: bob 2.2s ease-in-out infinite; }
+  .mzpoo { position:absolute; width:56px; height:56px; z-index:3; font-size:28px;
     display:flex; align-items:center; justify-content:center;
     filter:drop-shadow(0 2px 2px rgba(0,0,0,.15)); pointer-events:none; }
-  #bigdog { position:absolute; font-size:96px; z-index:7; pointer-events:none;
-    transition:left .5s ease, top .5s ease; filter:drop-shadow(0 5px 5px rgba(0,0,0,.18)); }
-  #cyclist { position:absolute; font-size:54px; z-index:7; pointer-events:none;
-    transition:left .28s linear, top .28s linear; filter:drop-shadow(0 4px 4px rgba(0,0,0,.18)); }
+  .mzpoo.appear { animation: poofin .45s ease; }
+  @keyframes poofin { 0%{ transform:scale(0); opacity:0; } 70%{ transform:scale(1.2); } 100%{ transform:scale(1); opacity:1; } }
+  .mzpoo.fade { animation: poofout .5s ease forwards; }
+  @keyframes poofout { to { transform:scale(.2); opacity:0; } }
+  #bigdog { position:absolute; font-size:84px; z-index:7; pointer-events:none;
+    transition:left .45s ease, top .45s ease; filter:drop-shadow(0 5px 5px rgba(0,0,0,.18)); }
+  #cyclist { position:absolute; font-size:48px; z-index:7; pointer-events:none;
+    transform:scaleX(-1); transform-origin:center;
+    transition:left .26s linear, top .26s linear; filter:drop-shadow(0 4px 4px rgba(0,0,0,.18)); }
   #cyclist.no-trans-b { transition:none; }
-  .friendM { position:absolute; width:58px; height:62px; z-index:5; pointer-events:none;
-    transition:left 1.5s linear, top 1.5s linear; }
+  .friendM { position:absolute; width:52px; height:56px; z-index:5; pointer-events:none;
+    transition:left 1.6s linear, top 1.6s linear; }
   .friendM svg { width:100%; height:100%; overflow:visible; }
-  .friendM .fname { position:absolute; left:50%; top:-22px; transform:translateX(-50%);
-    background:#fff; color:#4a3a28; font-weight:800; font-size:14px; padding:2px 10px; border-radius:10px;
+  .friendM .fname { position:absolute; left:50%; top:-20px; transform:translateX(-50%);
+    background:#fff; color:#4a3a28; font-weight:800; font-size:13px; padding:2px 9px; border-radius:10px;
     box-shadow:0 2px 5px rgba(0,0,0,.15); white-space:nowrap; }
-  .friendM.found::after { content:"💛"; position:absolute; top:-8px; right:-12px; font-size:24px; }
+  .friendM.found::after { content:"💛"; position:absolute; top:-6px; right:-10px; font-size:22px; }
   .friendM.found { animation: bob 1.2s ease-in-out infinite; }
   #rosie .mascot { display:none; }
   #rosie.mini .mascot { display:none; }
@@ -295,6 +301,7 @@
   #rosie.mini.face-left svg { transform:scaleX(-1); }
   #rosie.mini.stepping { animation: hopstep .24s ease; }
   @keyframes hopstep { 50% { transform:translateY(-7px); } }
+  body.lawn { background: linear-gradient(#93cf72,#7cbb5e); }
   .dpadBtn { border:none; border-radius:20px; width:86px; height:76px; font-size:38px;
     background:#fff1bd; cursor:pointer; box-shadow:0 5px 0 rgba(0,0,0,.15); }
   .dpadBtn:active { transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,.15); }
@@ -336,6 +343,15 @@
   .ga-btn:active { transform:translateY(2px); box-shadow:none; }
   .gate-q { font-size:24px; font-weight:800; color:#4a3a28; margin:8px 0; }
   #gateInput { font-size:28px; width:120px; padding:10px; border-radius:12px; border:3px solid #ccc; text-align:center; }
+  .vrow { display:flex; align-items:center; gap:8px; background:#f7f3ea; border-radius:12px;
+    padding:8px 10px; margin-bottom:6px; }
+  .vrow .vtext { flex:1; font-size:15px; color:#4a3a28; font-weight:600; }
+  .vrow.has { background:#e8f7e6; }
+  .vbtn { border:none; border-radius:10px; padding:8px 11px; font-size:16px; cursor:pointer;
+    background:#e2574c; color:#fff; font-weight:800; }
+  .vbtn.rec.on { background:#8b1f16; animation: glow 1s ease-in-out infinite; }
+  .vbtn.play { background:#4a90d9; }
+  .vbtn.del { background:#bbb; }
   .divider { border:none; border-top:2px dashed #ddd; margin:16px 0; }
   .muted { color:#888; font-size:15px; font-weight:600; }
 
@@ -343,18 +359,15 @@
   #winPanel { text-align:center; }
   #winPanel .bigdog { font-size:80px; }
   #winPanel h2 { justify-content:center; }
-  #winCoins { font-size:26px; color:#8a6d00; font-weight:800; margin:10px 0; }
   .winBtns { display:flex; gap:14px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
 </style>
 </head>
 <body>
 
 <div id="topbar">
-  <div class="pill" id="coinPill">🪙 <span id="coinCount">0</span></div>
   <div class="pill" style="font-size:17px;">🐶 Rosie's World</div>
   <div class="spacer"></div>
   <button class="pill" id="homeBtn" aria-label="Menu">🏠</button>
-  <button class="pill" id="shopBtn">🎁 Shop</button>
   <button class="pill" id="grownBtn" style="font-size:16px;">👨‍👩‍👦 Grown-ups</button>
 </div>
 
@@ -381,11 +394,16 @@
     <div id="parkScene">
       <div class="park-bg">
         <div class="park-grass"></div>
-        <div class="park-tree" style="left:70px; top:150px;">🌳</div>
-        <div class="park-tree" style="left:1010px; top:170px;">🌳</div>
-        <div class="park-tree" style="left:60px; top:530px;">🌲</div>
-        <div class="park-tree" style="left:1000px; top:540px;">🌳</div>
-        <div class="park-tree" style="left:520px; top:48px;">🌲</div>
+        <div class="park-tree" style="left:120px; top:-60px;">🌳</div>
+        <div class="park-tree" style="left:400px; top:-72px;">🌲</div>
+        <div class="park-tree" style="left:660px; top:-58px;">🌳</div>
+        <div class="park-tree" style="left:-60px; top:120px;">🌲</div>
+        <div class="park-tree" style="left:-70px; top:360px;">🌳</div>
+        <div class="park-tree" style="left:860px; top:110px;">🌳</div>
+        <div class="park-tree" style="left:872px; top:352px;">🌲</div>
+        <div class="park-tree" style="left:150px; top:548px;">🌳</div>
+        <div class="park-tree" style="left:430px; top:560px;">🌲</div>
+        <div class="park-tree" style="left:690px; top:546px;">🌳</div>
       </div>
     </div>
     <div id="rosie"></div>
@@ -399,22 +417,6 @@
     <div id="instrText">Hello!</div>
   </div>
   <div id="choiceRow"></div>
-</div>
-
-<!-- ===== Prize Shop ===== -->
-<div class="overlay" id="shopOverlay">
-  <div class="panel">
-    <button class="closeX" data-close="shopOverlay">✕</button>
-    <h2>🎁 Prize Shop</h2>
-    <div style="font-size:20px; font-weight:800; color:#8a6d00; margin-bottom:12px;">You have 🪙 <span id="shopCoins">0</span></div>
-    <div id="shopItems"></div>
-    <div id="owedSection" style="display:none;">
-      <hr class="divider">
-      <h2 style="font-size:22px;">🏆 Prizes to collect</h2>
-      <div class="muted" style="margin-bottom:8px;">Show Mum or Dad!</div>
-      <div id="owedListShop"></div>
-    </div>
-  </div>
 </div>
 
 <!-- ===== Grown-ups gate + area ===== -->
@@ -432,20 +434,21 @@
     <div id="grownBox" style="display:none;">
       <h2>⚙️ Grown-ups area</h2>
 
-      <h2 style="font-size:20px;">Prize prices</h2>
-      <div class="ga-row">🃏 Pokémon card: <input type="number" id="priceCard" inputmode="numeric"> coins</div>
-      <div class="ga-row">🎴 Pokémon pack: <input type="number" id="pricePack" inputmode="numeric"> coins</div>
-      <button class="ga-btn" id="savePrices">Save prices</button>
+      <div class="muted" style="margin-bottom:12px;">Games finished: <span id="bathCount">0</span></div>
 
-      <hr class="divider">
-      <h2 style="font-size:20px;">Prizes owed</h2>
-      <div id="owedListGrown" class="muted">None yet.</div>
-
-      <hr class="divider">
-      <h2 style="font-size:20px;">Coins</h2>
-      <div class="ga-row">Set coins: <input type="number" id="setCoins" inputmode="numeric">
-        <button class="ga-btn" id="applyCoins">Apply</button></div>
-      <div class="muted">Baths finished: <span id="bathCount">0</span></div>
+      <h2 style="font-size:20px;">🎤 Your own voice</h2>
+      <div class="muted" style="margin-bottom:8px;">Record yourself saying each line. Rosie will use your voice instead of the robot voice.</div>
+      <div class="ga-row">
+        <label style="font-weight:800;"><input type="checkbox" id="useVoice"> Use my recordings</label>
+        <span class="muted" id="voiceCount">0 of 0 recorded</span>
+      </div>
+      <div id="voiceList"></div>
+      <div class="ga-row">
+        <button class="ga-btn" id="voiceSave">⬇︎ Save voice pack</button>
+        <button class="ga-btn" id="voiceLoadBtn">⬆︎ Load voice pack</button>
+        <input type="file" id="voiceLoad" accept="application/json" style="display:none;">
+      </div>
+      <div class="muted">Recording needs the microphone, so use the web link (not a file opened from Files).</div>
 
       <hr class="divider">
       <h2 style="font-size:20px;">💾 Backup &amp; restore</h2>
@@ -470,9 +473,7 @@
     <div class="bigdog" id="winEmoji">🐶✨</div>
     <h2 id="winTitle">You did it!</h2>
     <div id="winSub" style="font-size:20px; color:#666; font-weight:700;">Good job!</div>
-    <div id="winCoins">+ 🪙 <span id="winCoinAmt">0</span> coins!</div>
     <div class="winBtns">
-      <button class="choice c-yellow" id="winShop"><span class="big">🎁</span>Prize Shop</button>
       <button class="choice c-green" id="winAgain"><span class="big">🛁</span>Again!</button>
       <button class="choice c-blue" id="winMenu"><span class="big">🏠</span>Menu</button>
     </div>
@@ -497,7 +498,7 @@
 
 /* ================= State & storage ================= */
 const SAVE_KEY = 'rosieBath.v1';
-const DEFAULTS = { coins:0, baths:0, prices:{card:150, pack:500}, owed:[] };
+const DEFAULTS = { baths:0, parks:0 };
 let S = load();
 
 function load(){
@@ -505,8 +506,7 @@ function load(){
     const raw = localStorage.getItem(SAVE_KEY);
     if(!raw) return JSON.parse(JSON.stringify(DEFAULTS));
     const d = JSON.parse(raw);
-    return Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), d,
-      { prices: Object.assign({}, DEFAULTS.prices, d.prices||{}) });
+    return Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), d);
   } catch(e){ return JSON.parse(JSON.stringify(DEFAULTS)); }
 }
 function save(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch(e){} }
@@ -526,8 +526,13 @@ if('speechSynthesis' in window){
 let lastSpoken = '';
 function say(text, remember=true){
   if(remember) lastSpoken = text;
+  if(typeof VOICE !== 'undefined' && VOICE.on && VOICE.clips[text]){
+    try { speechSynthesis.cancel(); } catch(e){}
+    if(playClip(VOICE.clips[text])) return;
+  }
   if(!('speechSynthesis' in window)) return;
   try {
+    if(voiceAudio){ voiceAudio.pause(); voiceAudio = null; }
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     if(voice) u.voice = voice;
@@ -667,13 +672,145 @@ function confettiBurst(){
     setTimeout(()=>c.remove(), 4200);
   }
 }
-function addCoins(n){
-  S.coins += n; save(); renderCoins();
-  sfx.coin();
+
+/* ================= Your own voice ================= */
+const VOICE_KEY = 'rosieVoice.v1';
+let VOICE = { on:false, clips:{} };
+try { const raw = localStorage.getItem(VOICE_KEY); if(raw) VOICE = Object.assign(VOICE, JSON.parse(raw)); } catch(e){}
+function saveVoice(){ try { localStorage.setItem(VOICE_KEY, JSON.stringify(VOICE)); } catch(e){ alert('Not enough space to save that recording.'); } }
+const LINES = [
+  "What will Rosie do today?",
+  "Bath time! Put Rosie in the bath.",
+  "Twist the tap! Get the arrow to the green middle.",
+  "Just right! Ahh!",
+  "Which shampoo does Rosie want? Tap one to sniff.",
+  "Mmm! Rosie loves Strawberry!",
+  "Mmm! Rosie loves Coconut!",
+  "Mmm! Rosie loves Lily!",
+  "Sniff sniff... not this one! Try another.",
+  "Squeeze the shampoo on Rosie! Three big squeezes!",
+  "One more squeeze!",
+  "Rub rub rub! Tap Rosie to make bubbles!",
+  "Keep going! More bubbles!",
+  "Wow! Rosie is so bubbly!",
+  "Feed Rosie 3 treats she likes!",
+  "Yuck! Rosie does not like that one!",
+  "Yum! Rosie's tummy is happy. She will stay in the bath!",
+  "Wash off all the soap! Tap the bubbles!",
+  "Nearly there! Pop the last bubbles!",
+  "All the soap is gone! Rosie is so clean!",
+  "Dry Rosie! Press and move the dryer. Don't stay in one spot!",
+  "Ouch! That spot got too hot! Keep the dryer moving. Let's dry her again.",
+  "Look! Rosie is dry and so fluffy!",
+  "Conditioner time! Hold the bottle to pour. Stop in the green!",
+  "A little more!",
+  "Whoops! Too much conditioner! Wash it off and try again.",
+  "Perfect! Now brush out the knots. Tap each knot!",
+  "You did it! Rosie is clean and fluffy! Great job!",
+  "Use the arrows! Walk Rosie to Oscar and Ollie!",
+  "Don't step on poo or ducks. Watch out for the bike and the big dog!",
+  "Ewww! Not on the poo!",
+  "Splash! The ducks say quack quack! Go around the pond!",
+  "Woah! That dog is too big! Wait for him to walk away!",
+  "Ding ding! Watch out for the bike!",
+  "You can do it! Go slowly and wait for a clear path.",
+  "You found Oscar! Now find Ollie!",
+  "You found Ollie! Now find Oscar!",
+  "Hooray! You found Oscar and Ollie! Rosie is so happy!",
+];
+let voiceAudio = null;
+function playClip(dataUri){
+  try {
+    if(voiceAudio){ voiceAudio.pause(); voiceAudio = null; }
+    voiceAudio = new Audio(dataUri);
+    voiceAudio.play().catch(()=>{});
+    return true;
+  } catch(e){ return false; }
 }
-function renderCoins(){
-  document.getElementById('coinCount').textContent = S.coins;
-  document.getElementById('shopCoins').textContent = S.coins;
+/* --- recorder UI --- */
+let recorder = null, recTarget = null, recChunks = [];
+function renderVoiceList(){
+  const box = document.getElementById('voiceList');
+  const chk = document.getElementById('useVoice');
+  if(!box) return;
+  const n = LINES.filter(t=>VOICE.clips[t]).length;
+  document.getElementById('voiceCount').textContent = n + ' of ' + LINES.length + ' recorded';
+  chk.checked = !!VOICE.on;
+  box.innerHTML = '';
+  LINES.forEach(text=>{
+    const has = !!VOICE.clips[text];
+    const row = document.createElement('div');
+    row.className = 'vrow' + (has ? ' has' : '');
+    row.innerHTML = `<div class="vtext">${text}</div>`;
+    const rec = document.createElement('button');
+    rec.className = 'vbtn rec' + (recTarget === text ? ' on' : '');
+    rec.textContent = recTarget === text ? '■' : '●';
+    rec.title = 'Record';
+    rec.addEventListener('click', ()=>toggleRecord(text));
+    row.appendChild(rec);
+    if(has){
+      const pl = document.createElement('button');
+      pl.className = 'vbtn play'; pl.textContent = '▶'; pl.title = 'Play';
+      pl.addEventListener('click', ()=>playClip(VOICE.clips[text]));
+      row.appendChild(pl);
+      const del = document.createElement('button');
+      del.className = 'vbtn del'; del.textContent = '✕'; del.title = 'Delete';
+      del.addEventListener('click', ()=>{ delete VOICE.clips[text]; saveVoice(); renderVoiceList(); });
+      row.appendChild(del);
+    }
+    box.appendChild(row);
+  });
+}
+async function toggleRecord(text){
+  if(recTarget === text){ if(recorder && recorder.state === 'recording') recorder.stop(); return; }
+  if(recorder && recorder.state === 'recording'){ recorder.stop(); return; }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    alert('Recording needs the microphone. Open the game from the web link (https), not a saved file.');
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    recChunks = [];
+    recorder = new MediaRecorder(stream);
+    recTarget = text;
+    recorder.ondataavailable = e=>{ if(e.data.size) recChunks.push(e.data); };
+    recorder.onstop = ()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      const blob = new Blob(recChunks, { type: recorder.mimeType || 'audio/webm' });
+      const fr = new FileReader();
+      fr.onload = ()=>{ VOICE.clips[text] = fr.result; if(!VOICE.on) VOICE.on = true; saveVoice(); recTarget = null; renderVoiceList(); };
+      fr.readAsDataURL(blob);
+    };
+    recorder.start();
+    renderVoiceList();
+  } catch(e){ alert('Could not use the microphone: ' + e.message); recTarget = null; renderVoiceList(); }
+}
+function wireVoiceUI(){
+  document.getElementById('useVoice').addEventListener('change', (e)=>{ VOICE.on = e.target.checked; saveVoice(); });
+  document.getElementById('voiceSave').addEventListener('click', ()=>{
+    const blob = new Blob([JSON.stringify(VOICE)], { type:'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'rosie-voice-pack.json';
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+  });
+  document.getElementById('voiceLoadBtn').addEventListener('click', ()=>document.getElementById('voiceLoad').click());
+  document.getElementById('voiceLoad').addEventListener('change', (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    const fr = new FileReader();
+    fr.onload = ()=>{
+      try {
+        const d = JSON.parse(fr.result);
+        if(!d || typeof d.clips !== 'object') throw new Error('bad');
+        VOICE = { on: d.on !== false, clips: d.clips };
+        saveVoice(); renderVoiceList();
+        alert('Voice pack loaded! ✅');
+      } catch(err){ alert('That file did not work.'); }
+    };
+    fr.readAsText(f);
+  });
 }
 
 /* ================= Instruction UI ================= */
@@ -704,8 +841,7 @@ let wrongTries = 0;         // per-question gentle-help counter
 let favShampoo = 0;         // index of Rosie's favourite this bath
 
 function stepDone(bonusText){
-  stepCoins += 5;
-  addCoins(5);
+  stepCoins++;
   if(bonusText) toast(POS.tub.x+40, POS.tub.y-40, bonusText);
 }
 
@@ -722,6 +858,7 @@ function resetScene(){
   parkState = null;
   tool.style.display = 'none';
   world.classList.remove('park-mode');
+  document.body.classList.remove('lawn');
 }
 function startBath(){
   lastMode = 'bath';
@@ -1403,21 +1540,17 @@ function finishBath(){
   tool.style.display = 'none';
   rosie.classList.add('sparkly','happy');
   stepDone();
-  const bonus = 15;
-  addCoins(bonus);
   S.baths++; save();
   confettiBurst();
   sfx.yay();
-  const total = stepCoins + bonus;
   instrText.textContent = "You did it! Rosie is clean and fluffy!";
-  say("You did it! Rosie is clean and fluffy! You earned " + total + " coins! Great job!");
-  setTimeout(()=>{ showWin('🐶✨','You gave Rosie a bath!','She is clean and fluffy. Good job!', total, '🛁','Wash again!'); }, 1600);
+  say("You did it! Rosie is clean and fluffy! Great job!");
+  setTimeout(()=>{ showWin('🐶✨','You gave Rosie a bath!','She is clean and fluffy. Good job!','🛁','Wash again!'); }, 1600);
 }
-function showWin(emoji, title, sub, total, againEmoji, againLabel){
+function showWin(emoji, title, sub, againEmoji, againLabel){
   document.getElementById('winEmoji').textContent = emoji;
   document.getElementById('winTitle').textContent = title;
   document.getElementById('winSub').textContent = sub;
-  document.getElementById('winCoinAmt').textContent = total;
   document.getElementById('winAgain').innerHTML = `<span class="big">${againEmoji}</span>${againLabel}`;
   showOverlay('winOverlay');
 }
@@ -1442,25 +1575,57 @@ function friendSVG(f){
     <ellipse cx="50" cy="64" rx="4.5" ry="5.5" fill="#f2889b"/>
   </svg>`;
 }
-/* hand-designed maze: 1 = hedge wall, 0 = path.
-   Every hazard cell has a detour route — nothing is ever fully blocked. */
+/* Maze: 1 = hedge, 0 = path. Generated + verified to have NO choke points,
+   so a poo can appear on any tile and a way around always exists. */
 const MZ = [
-  '11111111111',
-  '10000110001',
-  '10100110001',
-  '10100000101',
-  '10101101101',
-  '10001000001',
-  '11111111111',
+  '1111111111111',
+  '1000000000001',
+  '1000011001101',
+  '1000000000001',
+  '1011101110101',
+  '1000000000101',
+  '1010110000001',
+  '1000000010001',
+  '1111111111111',
 ];
-const CELL = 64, MX = 48, MY = 36;
+const CELL = 56, MX = 36, MY = 8;
+const START = { c:1, r:7 };
+const POND = [ {c:5,r:4}, {c:5,r:5}, {c:6,r:5} ];
+const DOGRUN = [ {c:8,r:1}, {c:9,r:1}, {c:10,r:1} ];
+const BIKEROW = 3, BIKE_FROM = 1, BIKE_TO = 11;
+const ZONES = [ [ {c:11,r:5}, {c:11,r:6} ], [ {c:1,r:1}, {c:2,r:1} ] ];
 function cellXY(c, r){ return { x: MX + c*CELL, y: MY + r*CELL }; }
 function isWall(c, r){ return !MZ[r] || MZ[r][c] !== '0'; }
 function sameCell(a, b){ return a.c === b.c && a.r === b.r; }
+function keyOf(c, r){ return c + ',' + r; }
+const PATH_CELLS = (function(){
+  const out = [];
+  for(let r = 0; r < MZ.length; r++)
+    for(let c = 0; c < MZ[r].length; c++)
+      if(MZ[r][c] === '0') out.push({c, r});
+  return out;
+})();
+/* would the maze still be fully walkable with these tiles blocked? */
+function mazeOpenWithout(blockedKeys){
+  const open = PATH_CELLS.filter(p=>!blockedKeys.has(keyOf(p.c, p.r)));
+  if(!open.length) return false;
+  const want = open.length, seen = new Set([keyOf(open[0].c, open[0].r)]);
+  const st = [open[0]];
+  while(st.length){
+    const cur = st.pop();
+    for(const d of [[1,0],[-1,0],[0,1],[0,-1]]){
+      const nc = cur.c+d[0], nr = cur.r+d[1], k = keyOf(nc, nr);
+      if(seen.has(k) || blockedKeys.has(k) || isWall(nc, nr)) continue;
+      seen.add(k); st.push({c:nc, r:nr});
+    }
+  }
+  return seen.size === want;
+}
 function startPark(){
   lastMode = 'park';
   resetScene();
   world.classList.add('park-mode');
+  document.body.classList.add('lawn');
   const scene = document.getElementById('parkScene');
   for(let r = 0; r < MZ.length; r++){
     for(let c = 0; c < MZ[r].length; c++){
@@ -1473,31 +1638,28 @@ function startPark(){
   }
   parkState = {
     active:true, moving:false, hits:0, foundCount:0,
-    rc:{c:1,r:5}, prev:{c:1,r:5},
-    poos:[ {c:1,r:2}, {c:7,r:5}, {c:8,r:5} ],
-    pond:[ {c:4,r:1}, {c:4,r:2} ],
-    dog:{ cells:[{c:7,r:1},{c:8,r:1},{c:9,r:1}], idx:0, dir:1, t:0, step:1.2, el:null },
-    bike:{ cells:[{c:3,r:3},{c:4,r:3},{c:5,r:3},{c:6,r:3},{c:7,r:3}], idx:0, riding:false, t:0, wait:3.5, stepT:0.3, el:null },
-    friends:[
-      { i:0, zone:[{c:9,r:2},{c:9,r:3}], at:0, t:0, found:false, el:null },
-      { i:1, zone:[{c:5,r:5},{c:6,r:5}], at:0, t:0, found:false, el:null },
-    ],
+    rc:{ c:START.c, r:START.r }, prev:{ c:START.c, r:START.r },
+    poos:[], pooTimer:1.5, maxPoo:3, pooLife:[7,12],
+    ducks:[], duckT:0, duckStep:1.7,
+    dog:{ idx:0, dir:1, t:0, step:1.15, el:null },
+    bike:{ col:BIKE_FROM, riding:false, t:0, wait:4, stepT:0.26, el:null },
+    friends: ZONES.map((z, i)=>({ i, zone:z, at:0, t:0, found:false, el:null })),
   };
-  parkState.pond.forEach((p, i)=>{
+  POND.forEach((p, i)=>{
     const q = cellXY(p.c, p.r);
     const el = document.createElement('div');
     el.className = 'mzpond parkItem';
     el.style.left = q.x+'px'; el.style.top = q.y+'px';
-    el.innerHTML = `<span class="duck" style="animation-delay:${i*0.8}s">🦆</span>`;
     scene.appendChild(el);
   });
-  parkState.poos.forEach(p=>{
-    const q = cellXY(p.c, p.r);
+  [0, 1].forEach(i=>{
     const el = document.createElement('div');
-    el.className = 'mzpoo parkItem';
-    el.textContent = '💩';
-    el.style.left = q.x+'px'; el.style.top = q.y+'px';
+    el.className = 'duck parkItem';
+    el.textContent = '🦆';
     scene.appendChild(el);
+    const d = { cell:{ c:POND[i].c, r:POND[i].r }, el };
+    parkState.ducks.push(d);
+    placeDuck(d);
   });
   const dg = document.createElement('div');
   dg.id = 'bigdog'; dg.className = 'parkItem'; dg.textContent = '🐕';
@@ -1515,7 +1677,7 @@ function startPark(){
     el.className = 'friendM parkItem';
     el.innerHTML = `<div class="fname">${f.name}</div>` + friendSVG(f);
     const q = cellXY(fr.zone[0].c, fr.zone[0].r);
-    el.style.left = (q.x+3)+'px'; el.style.top = (q.y-8)+'px';
+    el.style.left = (q.x+2)+'px'; el.style.top = (q.y-6)+'px';
     scene.appendChild(el);
     fr.el = el;
   });
@@ -1528,15 +1690,20 @@ function startPark(){
 function placeRosieCell(animate){
   const q = cellXY(parkState.rc.c, parkState.rc.r);
   if(animate === false) rosie.classList.add('no-trans');
-  rosie.style.left = q.x+'px';
-  rosie.style.top = (q.y-8)+'px';
+  rosie.style.left = (q.x+1)+'px';
+  rosie.style.top = (q.y-6)+'px';
   if(animate === false) requestAnimationFrame(()=>rosie.classList.remove('no-trans'));
 }
 function placeDog(){
   const d = parkState.dog;
-  const q = cellXY(d.cells[d.idx].c, d.cells[d.idx].r);
-  d.el.style.left = (q.x-18)+'px';
-  d.el.style.top = (q.y-42)+'px';
+  const q = cellXY(DOGRUN[d.idx].c, DOGRUN[d.idx].r);
+  d.el.style.left = (q.x-16)+'px';
+  d.el.style.top = (q.y-34)+'px';
+}
+function placeDuck(d){
+  const q = cellXY(d.cell.c, d.cell.r);
+  d.el.style.left = (q.x+12)+'px';
+  d.el.style.top = (q.y+8)+'px';
 }
 function buildDpad(){
   clearChoices();
@@ -1566,7 +1733,7 @@ function tryMove(dc, dr){
   if(dc < 0) rosie.classList.add('face-left');
   if(dc > 0) rosie.classList.remove('face-left');
   rosie.classList.remove('stepping');
-  void rosie.offsetWidth;              // restart the hop each step
+  void rosie.offsetWidth;
   rosie.classList.add('stepping');
   parkState.prev = { c:parkState.rc.c, r:parkState.rc.r };
   parkState.rc = { c:nc, r:nr };
@@ -1576,15 +1743,16 @@ function tryMove(dc, dr){
     if(!parkState) return;
     parkState.moving = false;
     checkCell();
-  }, 240);
+  }, 220);
 }
 function checkCell(){
   const ps = parkState, rc = ps.rc;
   if(!ps.active) return;
-  if(ps.poos.some(p=>sameCell(p, rc))) return hazardM('poo');
-  if(ps.pond.some(p=>sameCell(p, rc))) return hazardM('pond');
-  if(sameCell(ps.dog.cells[ps.dog.idx], rc)) return hazardM('dog');
-  if(ps.bike.riding && sameCell(ps.bike.cells[ps.bike.idx], rc)) return hazardM('bike');
+  if(ps.poos.some(p=>sameCell(p.cell, rc))) return hazardM('poo');
+  if(POND.some(p=>sameCell(p, rc))) return hazardM('pond');
+  if(ps.ducks.some(d=>sameCell(d.cell, rc))) return hazardM('duck');
+  if(sameCell(DOGRUN[ps.dog.idx], rc)) return hazardM('dog');
+  if(ps.bike.riding && ps.bike.col === rc.c && BIKEROW === rc.r) return hazardM('bike');
   for(const fr of ps.friends){
     if(!fr.found && fr.zone.some(z=>sameCell(z, rc))) return collectFriend(fr);
   }
@@ -1596,20 +1764,23 @@ function hazardM(kind){
   rosie.classList.add('wiggle');
   setTimeout(()=>rosie.classList.remove('wiggle'), 500);
   const q = cellXY(ps.rc.c, ps.rc.r);
-  if(kind === 'poo'){ toast(q.x-26, q.y-46, "Ewww! Poo!"); say("Ewww! Not on the poo!"); floatEmoji(q.x+16, q.y-14, '🤢'); }
-  if(kind === 'pond'){ toast(q.x-36, q.y-46, "Splash! Quack!"); say("Splash! The ducks say quack quack! Go around the pond!"); floatEmoji(q.x+16, q.y-14, '💦'); }
-  if(kind === 'dog'){ toast(q.x-26, q.y-46, "Woof! Woof!"); say("Woah! That dog is too big! Wait for him to walk away!"); }
-  if(kind === 'bike'){ toast(q.x-26, q.y-46, "Ding ding!"); say("Ding ding! Watch out for the bike!"); }
+  if(kind === 'poo'){ toast(q.x-26, q.y-42, "Ewww! Poo!"); say("Ewww! Not on the poo!"); floatEmoji(q.x+14, q.y-12, '🤢'); }
+  if(kind === 'pond'){ toast(q.x-34, q.y-42, "Splash!"); say("Splash! Go around the pond!"); floatEmoji(q.x+14, q.y-12, '💦'); }
+  if(kind === 'duck'){ toast(q.x-34, q.y-42, "Quack quack!"); say("Quack quack! Don't bump the ducks!"); floatEmoji(q.x+14, q.y-12, '💦'); }
+  if(kind === 'dog'){ toast(q.x-26, q.y-42, "Woof! Woof!"); say("Woah! That dog is too big! Wait for him to walk away!"); }
+  if(kind === 'bike'){ toast(q.x-26, q.y-42, "Ding ding!"); say("Ding ding! Watch out for the bike!"); }
   ps.moving = true;
   setTimeout(()=>{
     if(!parkState) return;
     parkState.rc = { c:parkState.prev.c, r:parkState.prev.r };
     placeRosieCell();
-    setTimeout(()=>{ if(parkState) parkState.moving = false; }, 260);
+    setTimeout(()=>{ if(parkState) parkState.moving = false; }, 240);
   }, 320);
   if(ps.hits === 3){
-    ps.dog.step = 1.9;
+    ps.dog.step = 1.8;
     ps.bike.wait += 3;
+    ps.duckStep = 2.6;
+    ps.maxPoo = 2;
     setTimeout(()=>{ if(parkState) say("You can do it! Go slowly and wait for a clear path."); }, 2200);
   }
 }
@@ -1618,10 +1789,9 @@ function collectFriend(fr){
   parkState.foundCount++;
   fr.el.classList.add('found');
   sfx.yay();
-  addCoins(10);
   const f = FRIENDS[fr.i];
   const q = cellXY(parkState.rc.c, parkState.rc.r);
-  floatEmoji(q.x+20, q.y-24, '💛');
+  floatEmoji(q.x+18, q.y-20, '💛');
   rosie.classList.add('happy');
   setTimeout(()=>rosie.classList.remove('happy'), 1800);
   if(parkState.foundCount >= 2){
@@ -1634,61 +1804,133 @@ function collectFriend(fr){
 function parkWin(){
   parkState.active = false;
   rosie.classList.add('sparkly','happy');
-  addCoins(10);
+  S.parks++; save();
   confettiBurst();
   sfx.yay();
   instrText.textContent = "You found Oscar and Ollie!";
-  say("Hooray! You found Oscar and Ollie! Rosie is so happy! You earned 30 coins!");
-  setTimeout(()=>showWin('🐶🐶🐶','You found Oscar and Ollie!','Rosie loves playing with her friends!',30,'🌳','Play again!'), 1700);
+  say("Hooray! You found Oscar and Ollie! Rosie is so happy!");
+  setTimeout(()=>showWin('🐶🐶🐶','You found Oscar and Ollie!','Rosie loves playing with her friends!','🌳','Play again!'), 1700);
+}
+/* --- poo that appears and disappears, never two side by side --- */
+function pooBlockedKeys(extra){
+  const s = new Set(parkState.poos.map(p=>keyOf(p.cell.c, p.cell.r)));
+  if(extra) s.add(keyOf(extra.c, extra.r));
+  return s;
+}
+function canPlacePoo(cell){
+  const ps = parkState;
+  if(sameCell(cell, ps.rc) || sameCell(cell, ps.prev)) return false;
+  if(POND.some(p=>sameCell(p, cell))) return false;
+  if(DOGRUN.some(p=>sameCell(p, cell))) return false;
+  if(ps.ducks.some(d=>sameCell(d.cell, cell))) return false;
+  if(ZONES.some(z=>z.some(p=>sameCell(p, cell)))) return false;
+  if(sameCell(cell, START)) return false;
+  // never two in a row: no poo on an orthogonally touching tile
+  for(const p of ps.poos){
+    if(Math.abs(p.cell.c-cell.c) + Math.abs(p.cell.r-cell.r) <= 1) return false;
+  }
+  return mazeOpenWithout(pooBlockedKeys(cell));
+}
+function spawnPoo(){
+  const ps = parkState;
+  const opts = PATH_CELLS.filter(canPlacePoo);
+  if(!opts.length) return;
+  const cell = opts[Math.floor(Math.random()*opts.length)];
+  const q = cellXY(cell.c, cell.r);
+  const el = document.createElement('div');
+  el.className = 'mzpoo parkItem appear';
+  el.textContent = '💩';
+  el.style.left = q.x+'px'; el.style.top = q.y+'px';
+  document.getElementById('parkScene').appendChild(el);
+  ps.poos.push({ cell, el, life: ps.pooLife[0] + Math.random()*(ps.pooLife[1]-ps.pooLife[0]) });
 }
 function parkTick(dt){
   const ps = parkState;
   for(const fr of ps.friends){
-    if(fr.found) continue;
     fr.t += dt;
-    if(fr.t > 1.8){
+    if(fr.t > 1.9){
       fr.t = 0;
       fr.at = 1 - fr.at;
       const q = cellXY(fr.zone[fr.at].c, fr.zone[fr.at].r);
-      fr.el.style.left = (q.x+3)+'px';
-      fr.el.style.top = (q.y-8)+'px';
+      fr.el.style.left = (q.x+2)+'px';
+      fr.el.style.top = (q.y-6)+'px';
     }
   }
   if(!ps.active) return;
+  // poo lifecycle
+  for(let i = ps.poos.length-1; i >= 0; i--){
+    const p = ps.poos[i];
+    p.life -= dt;
+    if(p.life <= 0){
+      p.el.classList.add('fade');
+      const el = p.el;
+      setTimeout(()=>el.remove(), 500);
+      ps.poos.splice(i, 1);
+    }
+  }
+  ps.pooTimer -= dt;
+  if(ps.pooTimer <= 0){
+    ps.pooTimer = 2 + Math.random()*2.5;
+    if(ps.poos.length < ps.maxPoo) spawnPoo();
+  }
+  // ducks paddle around the pond and onto the grass beside it
+  ps.duckT += dt;
+  if(ps.duckT > ps.duckStep){
+    ps.duckT = 0;
+    for(const d of ps.ducks){
+      const opts = [];
+      for(const dd of [[1,0],[-1,0],[0,1],[0,-1],[0,0]]){
+        const nc = d.cell.c+dd[0], nr = d.cell.r+dd[1];
+        if(isWall(nc, nr)) continue;
+        const near = POND.some(p=>Math.abs(p.c-nc) + Math.abs(p.r-nr) <= 1);
+        if(!near) continue;                                   // ducks stay by the water
+        if(ps.ducks.some(o=>o !== d && o.cell.c === nc && o.cell.r === nr)) continue;
+        if(ps.poos.some(p=>sameCell(p.cell, nc===d.cell.c&&nr===d.cell.r?{c:-1,r:-1}:{c:nc,r:nr}))) continue;
+        opts.push({ c:nc, r:nr });
+      }
+      if(!opts.length) continue;
+      d.cell = opts[Math.floor(Math.random()*opts.length)];
+      placeDuck(d);
+      if(sameCell(d.cell, ps.rc) && !ps.moving) return hazardM('duck');
+    }
+  }
+  // big dog patrols his corridor
   const d = ps.dog;
   d.t += dt;
   if(d.t > d.step){
     d.t = 0;
-    if(d.idx + d.dir < 0 || d.idx + d.dir >= d.cells.length) d.dir *= -1;
+    if(d.idx + d.dir < 0 || d.idx + d.dir >= DOGRUN.length) d.dir *= -1;
     d.idx += d.dir;
     d.el.style.transform = d.dir > 0 ? 'scaleX(-1)' : '';
     placeDog();
-    if(sameCell(d.cells[d.idx], ps.rc) && !ps.moving) hazardM('dog');
+    if(sameCell(DOGRUN[d.idx], ps.rc) && !ps.moving) return hazardM('dog');
   }
+  // cyclist — always rides forwards, left to right, then loops back off-screen
   const b = ps.bike;
   b.t += dt;
   if(!b.riding){
     if(b.t > b.wait){
-      b.t = 0; b.riding = true; b.idx = 0;
-      const q = cellXY(b.cells[0].c, b.cells[0].r);
+      b.t = 0; b.riding = true; b.col = BIKE_FROM;
+      const q = cellXY(b.col, BIKEROW);
       b.el.style.display = 'block';
       b.el.classList.add('no-trans-b');
-      b.el.style.left = (q.x+4)+'px'; b.el.style.top = (q.y-10)+'px';
+      b.el.style.left = (q.x+2)+'px'; b.el.style.top = (q.y-8)+'px';
       requestAnimationFrame(()=>b.el.classList.remove('no-trans-b'));
-      toast(q.x-30, q.y-52, "🔔 Ding ding!");
+      toast(q.x-28, q.y-46, "🔔 Ding ding!");
       tone(1200, .12, 'sine', .1); tone(1500, .14, 'sine', .1, .13);
+      if(b.col === ps.rc.c && BIKEROW === ps.rc.r && !ps.moving) return hazardM('bike');
     }
   } else if(b.t > b.stepT){
     b.t = 0;
-    b.idx++;
-    if(b.idx >= b.cells.length){
+    b.col++;
+    if(b.col > BIKE_TO){
       b.riding = false;
       b.el.style.display = 'none';
-      b.wait = 3.5 + Math.random()*3;
+      b.wait = 4 + Math.random()*3;
     } else {
-      const q = cellXY(b.cells[b.idx].c, b.cells[b.idx].r);
-      b.el.style.left = (q.x+4)+'px'; b.el.style.top = (q.y-10)+'px';
-      if(sameCell(b.cells[b.idx], ps.rc) && !ps.moving) hazardM('bike');
+      const q = cellXY(b.col, BIKEROW);
+      b.el.style.left = (q.x+2)+'px'; b.el.style.top = (q.y-8)+'px';
+      if(b.col === ps.rc.c && BIKEROW === ps.rc.r && !ps.moving) return hazardM('bike');
     }
   }
 }
@@ -1700,49 +1942,6 @@ document.querySelectorAll('.closeX').forEach(b=>{
   b.addEventListener('click', ()=>hideOverlay(b.dataset.close));
 });
 
-/* ---------- Prize shop ---------- */
-const PRIZES = [
-  { key:'card', icon:'🃏', name:'Pokémon card' },
-  { key:'pack', icon:'🎴', name:'Pokémon pack' },
-];
-function renderShop(){
-  renderCoins();
-  const box = document.getElementById('shopItems');
-  box.innerHTML = '';
-  PRIZES.forEach(p=>{
-    const price = S.prices[p.key];
-    const item = document.createElement('div');
-    item.className = 'shop-item';
-    item.innerHTML = `<div class="icon">${p.icon}</div>
-      <div class="info"><div class="name">${p.name}</div><div class="price">🪙 ${price} coins</div></div>`;
-    const btn = document.createElement('button');
-    btn.className = 'buyBtn';
-    btn.textContent = S.coins>=price ? 'Buy!' : 'Save up!';
-    btn.disabled = S.coins < price;
-    btn.addEventListener('click', ()=>{
-      if(S.coins < price) return;
-      S.coins -= price;
-      S.owed.push({ name:p.name, icon:p.icon, when:new Date().toLocaleDateString() });
-      save();
-      sfx.yay();
-      say(`You bought a ${p.name}! Show Mum or Dad to collect it!`);
-      renderShop();
-    });
-    item.appendChild(btn);
-    box.appendChild(item);
-  });
-  // owed list
-  const owedSec = document.getElementById('owedSection');
-  const owedList = document.getElementById('owedListShop');
-  if(S.owed.length){
-    owedSec.style.display = '';
-    owedList.innerHTML = S.owed.map(o=>`<div class="owed">${o.icon} ${o.name} <span class="muted">(${o.when})</span></div>`).join('');
-  } else owedSec.style.display = 'none';
-}
-document.getElementById('shopBtn').addEventListener('click', ()=>{ renderShop(); showOverlay('shopOverlay'); });
-document.getElementById('winShop').addEventListener('click', ()=>{
-  hideOverlay('winOverlay'); renderShop(); showOverlay('shopOverlay');
-});
 document.getElementById('winAgain').addEventListener('click', ()=>{
   hideOverlay('winOverlay');
   if(lastMode === 'park') startPark(); else startBath();
@@ -1751,7 +1950,7 @@ document.getElementById('winMenu').addEventListener('click', ()=>{
   hideOverlay('winOverlay'); showMenu();
 });
 document.getElementById('homeBtn').addEventListener('click', ()=>{
-  ['winOverlay','shopOverlay','grownOverlay'].forEach(hideOverlay);
+  ['winOverlay','grownOverlay'].forEach(hideOverlay);
   showMenu();
 });
 function showMenu(){
@@ -1788,37 +1987,9 @@ document.getElementById('gateGo').addEventListener('click', ()=>{
   }
 });
 function renderGrown(){
-  document.getElementById('priceCard').value = S.prices.card;
-  document.getElementById('pricePack').value = S.prices.pack;
-  document.getElementById('setCoins').value = S.coins;
-  document.getElementById('bathCount').textContent = S.baths;
-  const list = document.getElementById('owedListGrown');
-  if(!S.owed.length){ list.textContent = 'None yet.'; list.className='muted'; return; }
-  list.className = '';
-  list.innerHTML = '';
-  S.owed.forEach((o,i)=>{
-    const row = document.createElement('div');
-    row.className = 'owed';
-    row.innerHTML = `${o.icon} ${o.name} <span class="muted">(${o.when})</span>`;
-    const done = document.createElement('button');
-    done.textContent = 'Given ✓';
-    done.addEventListener('click', ()=>{ S.owed.splice(i,1); save(); renderGrown(); });
-    row.appendChild(done);
-    list.appendChild(row);
-  });
+  document.getElementById('bathCount').textContent = S.baths + ' baths, ' + S.parks + ' park visits';
+  renderVoiceList();
 }
-document.getElementById('savePrices').addEventListener('click', ()=>{
-  const c = parseInt(document.getElementById('priceCard').value,10);
-  const p = parseInt(document.getElementById('pricePack').value,10);
-  if(c>0) S.prices.card = c;
-  if(p>0) S.prices.pack = p;
-  save();
-  say('Prices saved.', false);
-});
-document.getElementById('applyCoins').addEventListener('click', ()=>{
-  const v = parseInt(document.getElementById('setCoins').value,10);
-  if(!isNaN(v) && v>=0){ S.coins = v; save(); renderCoins(); }
-});
 document.getElementById('makeBackup').addEventListener('click', ()=>{
   const code = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
   document.getElementById('backupCode').value = code;
@@ -1835,19 +2006,18 @@ document.getElementById('doRestore').addEventListener('click', ()=>{
   if(!code) return;
   try {
     const d = JSON.parse(decodeURIComponent(escape(atob(code))));
-    if(typeof d.coins !== 'number') throw new Error('bad');
-    S = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), d,
-      { prices: Object.assign({}, DEFAULTS.prices, d.prices||{}) });
-    save(); renderCoins(); renderGrown();
+    if(typeof d.baths !== 'number') throw new Error('bad');
+    S = Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), d);
+    save(); renderGrown();
     alert('Restored! ✅');
   } catch(e){ alert('That code did not work. Check it and try again.'); }
 });
 document.getElementById('resetAll').addEventListener('click', ()=>{
-  if(confirm('Reset ALL progress, coins and prizes?')){
+  if(confirm('Reset all progress?')){
     S = JSON.parse(JSON.stringify(DEFAULTS));
-    save(); renderCoins();
+    save();
     hideOverlay('grownOverlay');
-    startBath();
+    showMenu();
   }
 });
 
@@ -1888,7 +2058,7 @@ window.addEventListener('pointercancel', ()=>{
 
 /* ================= Boot ================= */
 fitWorld();
-renderCoins();
+wireVoiceUI();
 // warm up audio on first touch (iOS requirement)
 document.body.addEventListener('pointerdown', function once(){
   ac();
