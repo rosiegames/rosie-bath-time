@@ -674,10 +674,28 @@ function confettiBurst(){
 }
 
 /* ================= Your own voice ================= */
+var BAKED_VOICE = null;
 const VOICE_KEY = 'rosieVoice.v1';
 let VOICE = { on:false, clips:{} };
-try { const raw = localStorage.getItem(VOICE_KEY); if(raw) VOICE = Object.assign(VOICE, JSON.parse(raw)); } catch(e){}
-function saveVoice(){ try { localStorage.setItem(VOICE_KEY, JSON.stringify(VOICE)); } catch(e){ alert('Not enough space to save that recording.'); } }
+if(typeof BAKED_VOICE === 'object' && BAKED_VOICE){   // a voice recorded by a grown-up, shipped with the game
+  VOICE.clips = Object.assign({}, BAKED_VOICE);
+  VOICE.on = true;
+}
+try {
+  const raw = localStorage.getItem(VOICE_KEY);
+  if(raw){
+    const d = JSON.parse(raw);
+    VOICE.clips = Object.assign(VOICE.clips, d.clips || {});   // this device's own takes win
+    if(typeof d.on === 'boolean') VOICE.on = d.on;
+  }
+} catch(e){}
+function saveVoice(){
+  const baked = (typeof BAKED_VOICE === 'object' && BAKED_VOICE) ? BAKED_VOICE : {};
+  const mine = {};
+  for(const k in VOICE.clips){ if(VOICE.clips[k] !== baked[k]) mine[k] = VOICE.clips[k]; }
+  try { localStorage.setItem(VOICE_KEY, JSON.stringify({ on:VOICE.on, clips:mine })); }
+  catch(e){ alert('Not enough space to save that recording.'); }
+}
 const LINES = [
   "What will Rosie do today?",
   "Bath time! Put Rosie in the bath.",
