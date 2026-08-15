@@ -306,6 +306,77 @@
     background:#fff1bd; cursor:pointer; box-shadow:0 5px 0 rgba(0,0,0,.15); }
   .dpadBtn:active { transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,.15); }
 
+  /* ---------- Vet visit ---------- */
+  #vetScene { position:absolute; left:0; top:0; width:800px; height:520px; display:none; z-index:1; }
+  #world.vet-mode #vetScene { display:block; }
+  #world.vet-mode .tile-wall, #world.vet-mode .floor, #world.vet-mode .window, #world.vet-mode #tubWrap { display:none; }
+  body.clinic { background: linear-gradient(#dff0ea 0%, #eef7f3 60%, #e3ece8 100%); }
+  .vet-bg { position:absolute; left:-200px; right:-200px; top:-140px; bottom:-140px; }
+  .vet-wall { position:absolute; inset:0; background:linear-gradient(#e4f2ec,#f3faf7); }
+  .vet-rail { position:absolute; left:0; right:0; top:322px; height:9px; background:#c6ddd4; }
+  .vet-poster { position:absolute; width:120px; height:92px; border-radius:12px; background:#fff;
+    box-shadow:0 3px 8px rgba(0,0,0,.09); display:flex; align-items:center; justify-content:center; font-size:44px; }
+  .vet-table { position:absolute; left:150px; top:344px; width:500px; height:26px; border-radius:12px;
+    background:linear-gradient(#f2f6f8,#d5dfe4); box-shadow:0 5px 0 #bcc9cf; }
+  .vet-leg { position:absolute; top:370px; width:22px; height:96px; background:#c3ced4; border-radius:0 0 8px 8px; }
+  .vet-cabinet { position:absolute; left:64px; top:250px; width:120px; height:96px; border-radius:10px;
+    background:linear-gradient(#fbfdfc,#dde9e4); box-shadow:0 4px 0 #c3d3cc, inset 0 0 0 3px #d3e0da; }
+  .vet-jar { position:absolute; top:214px; width:36px; height:38px; border-radius:6px 6px 10px 10px;
+    background:rgba(255,255,255,.85); box-shadow:0 2px 5px rgba(0,0,0,.12), inset 0 0 0 2px #d8e6e0;
+    display:flex; align-items:center; justify-content:center; font-size:19px; }
+  .vspot { position:absolute; width:62px; height:62px; border-radius:50%; z-index:12; cursor:pointer;
+    background:rgba(255,255,255,.94); box-shadow:0 3px 10px rgba(0,0,0,.18), 0 0 0 4px rgba(90,190,160,.5);
+    display:flex; align-items:center; justify-content:center;
+    animation: bob 2.4s ease-in-out infinite; }
+  .vspot.small { width:48px; height:48px; }
+  .vspot.small .ico { font-size:24px; }
+  .vspot .ico { font-size:32px; pointer-events:none; }
+  .vspot .vlabel { position:absolute; bottom:-22px; left:50%; transform:translateX(-50%);
+    font-size:14px; font-weight:800; color:#3c5a50; background:#fff; padding:2px 9px; border-radius:9px;
+    box-shadow:0 2px 4px rgba(0,0,0,.12); white-space:nowrap; pointer-events:none; }
+  .vspot.done { animation:none; box-shadow:0 3px 10px rgba(0,0,0,.12), 0 0 0 4px rgba(95,199,95,.75); cursor:default; }
+  .vspot.holdable .holdRing { position:absolute; inset:-6px; border-radius:50%; pointer-events:none;
+    border:5px solid rgba(90,190,160,.35); border-top-color:#3fae8a; opacity:0; }
+  .vspot.holding .holdRing { opacity:1; animation: spinring 1.1s linear; }
+  .vspot.holding .holdRing.big { animation-duration: 2.4s; }
+  @keyframes spinring { to { transform:rotate(720deg); } }
+  .vspot .countNum { position:absolute; top:-30px; left:50%; transform:translateX(-50%);
+    font-size:30px; font-weight:800; color:#2f7a63; pointer-events:none; }
+  .vspot.listening { box-shadow:0 3px 10px rgba(0,0,0,.18), 0 0 0 6px rgba(232,120,140,.6); }
+  .beatRing { position:absolute; width:80px; height:80px; border-radius:50%; z-index:9; pointer-events:none;
+    border:5px solid rgba(232,120,140,.85); animation: beatpulse .8s ease-out forwards; }
+  @keyframes beatpulse { 0%{transform:scale(.35); opacity:1} 100%{transform:scale(1.5); opacity:0} }
+  .pawCard { position:absolute; left:118px; top:352px; width:270px; z-index:14;
+    background:#fff; border-radius:20px; padding:12px 14px 16px; box-shadow:0 6px 16px rgba(0,0,0,.16); }
+  .pawTitle { font-size:16px; font-weight:800; color:#3c5a50; margin-bottom:8px; }
+  .nails { display:flex; gap:10px; justify-content:center; }
+  .nail { width:50px; height:86px; border-radius:26px 26px 12px 12px; overflow:hidden;
+    background:#f6efe2; box-shadow:inset 0 0 0 3px #e2d6c2; position:relative; }
+  .nail .tip { position:absolute; left:0; right:0; top:0; height:46px; background:#fdfaf2; cursor:pointer; }
+  .nail .quick { position:absolute; left:0; right:0; bottom:0; height:40px; background:#f6a9b4; cursor:pointer; }
+  .nails.showtips .nail:not(.cut) .tip { box-shadow: inset 0 0 0 4px #ffd44d; }
+  .nail.cut { opacity:.45; }
+  .nail.cut .tip { height:16px; }
+  .nail.shake { animation: wiggle .4s ease; }
+  .syringe { position:absolute; left:150px; top:372px; width:500px; height:74px; z-index:14;
+    display:flex; align-items:center; }
+  .syringe .barrel { position:relative; flex:1; height:52px; border-radius:10px; background:#fff;
+    box-shadow: inset 0 0 0 4px #c3ced4; overflow:visible; cursor:pointer; }
+  .syringe .fluid { position:absolute; left:4px; top:4px; bottom:4px; width:0;
+    background:linear-gradient(#b9e0f6,#79c3e8); border-radius:7px; transition:width .12s; }
+  .syringe .marks { position:absolute; inset:0; pointer-events:none; }
+  .syringe .mk { position:absolute; top:0; bottom:0; width:1px; background:rgba(70,100,115,.35); }
+  .syringe .mk span { position:absolute; bottom:-21px; left:50%; transform:translateX(-50%);
+    font-size:13px; font-weight:800; color:#4a6b78; }
+  .syringe .targetLine { position:absolute; top:-9px; bottom:-9px; width:5px; margin-left:-2px;
+    background:#e2574c; border-radius:3px; pointer-events:none; }
+  .syringe .targetLine.flash { animation: glow 1s ease-in-out infinite; }
+  .syringe .plunger { position:absolute; top:-4px; height:60px; width:30px; margin-left:-6px;
+    background:#4a90d9; border-radius:8px; color:#fff; font-size:9px; font-weight:800;
+    display:flex; align-items:center; justify-content:center; cursor:grab; touch-action:none;
+    box-shadow:0 3px 0 #33689e; z-index:3; }
+  .syringe .needle { width:44px; height:6px; background:#b6c3ca; border-radius:3px; }
+
   /* ---------- Overlays (shop / grown-ups / win) ---------- */
   .overlay {
     position:fixed; inset:0; background:rgba(40,60,80,.45); z-index:100;
@@ -406,6 +477,21 @@
         <div class="park-tree" style="left:690px; top:546px;">🌳</div>
       </div>
     </div>
+    <div id="vetScene">
+      <div class="vet-bg">
+        <div class="vet-wall"></div>
+        <div class="vet-rail"></div>
+      </div>
+      <div class="vet-poster" style="left:70px; top:110px;">🐕</div>
+      <div class="vet-poster" style="left:620px; top:96px;">🦴</div>
+      <div class="vet-poster" style="left:640px; top:210px;">❤️</div>
+      <div class="vet-cabinet"></div>
+      <div class="vet-jar" style="left:88px;">🦴</div>
+      <div class="vet-jar" style="left:132px;">🍪</div>
+      <div class="vet-table"></div>
+      <div class="vet-leg" style="left:196px;"></div>
+      <div class="vet-leg" style="left:582px;"></div>
+    </div>
     <div id="rosie"></div>
     <div id="tool"></div>
   </div>
@@ -489,6 +575,7 @@
     <div class="winBtns">
       <button class="choice c-blue" id="menuBath"><span class="big">🛁</span>Bath time</button>
       <button class="choice c-green" id="menuPark"><span class="big">🌳</span>Park friends</button>
+      <button class="choice c-pink" id="menuVet"><span class="big">🩺</span>Vet visit</button>
     </div>
   </div>
 </div>
@@ -498,7 +585,7 @@
 
 /* ================= State & storage ================= */
 const SAVE_KEY = 'rosieBath.v1';
-const DEFAULTS = { baths:0, parks:0 };
+const DEFAULTS = { baths:0, parks:0, vets:0 };
 let S = load();
 
 function load(){
@@ -735,6 +822,33 @@ const LINES = [
   "You found Oscar! Now find Ollie!",
   "You found Ollie! Now find Oscar!",
   "Hooray! You found Oscar and Ollie! Rosie is so happy!",
+  "Check Rosie's ears, teeth and eyes. Tap each one!",
+  "Her ears look clean!",
+  "Her eyes are bright!",
+  "Her teeth are shiny!",
+  "Clip the nails. Only the white tip!",
+  "Careful! That pink part hurts. Clip the white tip.",
+  "All four nails done! Now let's clean her ears.",
+  "Clean her ears. Tap each ear twice!",
+  "Both ears are clean!",
+  "Feel Rosie's tummy. Press and hold each spot.",
+  "Nice and soft!",
+  "That tickles!",
+  "All good in there!",
+  "Rosie was brave! Give her 3 treats.",
+  "Good girl Rosie! You were so brave.",
+  "Perfect! Now give it to Rosie.",
+  "That's too much. Slide it back a bit.",
+  "A bit more please.",
+  "Gulp! Good girl.",
+  "Vaccination time. Press and hold. Count to 3!",
+  "Nearly! Hold it a bit longer.",
+  "All done! Rosie was so brave. She gets a sticker!",
+  "Last one! Listen to her heart. Tap the chest.",
+  "How many beats did you hear?",
+  "That's right! Her heart is strong and healthy.",
+  "Let's listen again. Count carefully!",
+  "All finished! Rosie is healthy and happy. You are a great vet!",
 ];
 let voiceAudio = null;
 function playClip(dataUri){
@@ -869,14 +983,17 @@ function resetScene(){
   rosie.className = '';
   rosie.style.display = '';
   clearChoices();
-  document.querySelectorAll('.bubble,.knot,.dryzone,.cream,.sdrop,.parkItem,.toast-bubble,#dialCard,#condUI,#shampooBottle').forEach(e=>e.remove());
+  document.querySelectorAll('.bubble,.knot,.dryzone,.cream,.sdrop,.parkItem,.vetItem,.toast-bubble,#dialCard,#condUI,#shampooBottle').forEach(e=>e.remove());
   if(dialState){ clearInterval(dialState.timer); dialState = null; }
   if(dryState){ dryState.active = false; dryState = null; }
   condState = null;
   parkState = null;
   tool.style.display = 'none';
   world.classList.remove('park-mode');
+  world.classList.remove('vet-mode');
   document.body.classList.remove('lawn');
+  document.body.classList.remove('clinic');
+  vetState = null;
 }
 function startBath(){
   lastMode = 'bath';
@@ -1953,6 +2070,435 @@ function parkTick(dt){
   }
 }
 
+/* ================= Vet visit ================= */
+let vetState = null;
+const VET_POS = { x:305, y:150 };
+function vetSpot(x, y, emoji, label, cls){
+  const el = document.createElement('div');
+  el.className = 'vspot vetItem ' + (cls || '');
+  el.style.left = (x-34)+'px'; el.style.top = (y-34)+'px';
+  el.innerHTML = `<span class="ico">${emoji}</span>` + (label ? `<span class="vlabel">${label}</span>` : '');
+  document.getElementById('vetScene').appendChild(el);
+  return el;
+}
+function vetDone(el){
+  el.classList.add('done');
+  el.querySelector('.ico').textContent = '✅';
+}
+function startVet(){
+  lastMode = 'vet';
+  resetScene();
+  world.classList.add('vet-mode');
+  document.body.classList.add('clinic');
+  vetState = { step:0, hold:null };
+  placeRosie(VET_POS);
+  rosie.classList.add('happy');
+  vetStep1();
+}
+/* ---- 1. ears, teeth and eyes ---- */
+function vetStep1(){
+  instruct("Check Rosie's ears, teeth and eyes. Tap each one!");
+  clearChoices();
+  const checks = [
+    { e:'👂', l:'Ears',  x:340, y:236, say:"Her ears look clean!",  pop:'✨' },
+    { e:'👀', l:'Eyes',  x:400, y:212, say:"Her eyes are bright!",  pop:'⭐' },
+    { e:'🦷', l:'Teeth', x:400, y:252, say:"Her teeth are shiny!",  pop:'💫' },
+  ];
+  let left = checks.length;
+  checks.forEach(c=>{
+    addChoice(c.e, c.l, 'c-blue', (b)=>{
+      if(b.disabled) return;
+      b.disabled = true;
+      b.style.opacity = .45;
+      b.innerHTML = '<span class="big">✅</span>' + c.l;
+      sfx.pop();
+      showTorch(c.x, c.y);
+      floatEmoji(c.x, c.y-34, c.pop);
+      toast(c.x-46, c.y-78, c.say);
+      say(c.say);
+      rosie.classList.add('wiggle');
+      setTimeout(()=>rosie.classList.remove('wiggle'), 500);
+      if(--left === 0){
+        sfx.yay();
+        stepDone();
+        setTimeout(()=>{ clearChoices(); vetStep2(); }, 1700);
+      }
+    });
+  });
+}
+function showTorch(x, y){
+  tool.textContent = '🔍';
+  tool.style.display = 'block';
+  tool.style.left = (x+90)+'px';
+  tool.style.top = (y+40)+'px';
+  requestAnimationFrame(()=>{ tool.style.left = (x-26)+'px'; tool.style.top = (y-52)+'px'; });
+  setTimeout(()=>{ if(vetState) tool.style.display = 'none'; }, 1300);
+}
+/* ---- 2. clip nails, clean ears ---- */
+function vetStep2(){
+  document.querySelectorAll('.vspot').forEach(e=>e.remove());
+  instruct("Clip the nails. Only the white tip!");
+  const card = document.createElement('div');
+  card.className = 'pawCard vetItem';
+  card.innerHTML = `<div class="pawTitle">🐾 Rosie's paw</div><div class="nails"></div>`;
+  document.getElementById('vetScene').appendChild(card);
+  const nails = card.querySelector('.nails');
+  let left = 4, warned = 0;
+  for(let i = 0; i < 4; i++){
+    const n = document.createElement('div');
+    n.className = 'nail';
+    n.innerHTML = `<div class="tip"></div><div class="quick"></div>`;
+    nails.appendChild(n);
+    n.querySelector('.tip').addEventListener('pointerdown', (ev)=>{
+      ev.stopPropagation();
+      if(n.classList.contains('cut')) return;
+      n.classList.add('cut');
+      sfx.pop();
+      tone(900, .06, 'square', .09);
+      const r = n.getBoundingClientRect();
+      const p = worldPoint(r.left + r.width/2, r.top);
+      floatEmoji(p.x, p.y, '✂️');
+      if(--left === 0){
+        sfx.yay();
+        toast(300, 300, "All four done!");
+        say("All four nails done! Now let's clean her ears.");
+        setTimeout(()=>{ card.remove(); cleanEars(); }, 1500);
+      }
+    });
+    n.querySelector('.quick').addEventListener('pointerdown', (ev)=>{
+      ev.stopPropagation();
+      if(n.classList.contains('cut')) return;
+      warned++;
+      sfx.no();
+      n.classList.add('shake');
+      setTimeout(()=>n.classList.remove('shake'), 500);
+      toast(300, 300, "Careful! Not the pink part.");
+      say("Careful! That pink part hurts. Clip the white tip.");
+      if(warned >= 2) nails.classList.add('showtips');
+    });
+  }
+}
+function cleanEars(){
+  instruct("Clean her ears. Tap each ear twice!");
+  let taps = { L:0, R:0 };
+  [['L',322,236],['R',478,236]].forEach(([side,x,y])=>{
+    const el = vetSpot(x, y, '👂', 'Wipe');
+    el.addEventListener('pointerdown', ()=>{
+      if(el.classList.contains('done')) return;
+      taps[side]++;
+      sfx.pop();
+      floatEmoji(x, y-24, '🧼');
+      tool.textContent = '🥢';
+      tool.style.display = 'block';
+      tool.style.left = (x+18)+'px'; tool.style.top = (y-46)+'px';
+      if(taps[side] >= 2){
+        vetDone(el);
+        if(taps.L >= 2 && taps.R >= 2){
+          tool.style.display = 'none';
+          sfx.yay();
+          toast(300, 180, "Squeaky clean!");
+          say("Both ears are clean!");
+          stepDone();
+          setTimeout(vetStep3, 1500);
+        }
+      }
+    });
+  });
+}
+/* ---- 3. feel the tummy ---- */
+function vetStep3(){
+  document.querySelectorAll('.vspot').forEach(e=>e.remove());
+  instruct("Feel Rosie's tummy. Press and hold each spot.");
+  const spots = [
+    { x:344, y:306, say:"Nice and soft!" },
+    { x:400, y:322, say:"That tickles!" },
+    { x:456, y:306, say:"All good in there!" },
+  ];
+  let left = spots.length;
+  spots.forEach(sp=>{
+    const el = vetSpot(sp.x, sp.y, '🤲', '');
+    el.classList.add('holdable','small');
+    const ring = document.createElement('div');
+    ring.className = 'holdRing';
+    el.appendChild(ring);
+    let t = null;
+    const start = ()=>{
+      if(el.classList.contains('done')) return;
+      el.classList.add('holding');
+      t = setTimeout(()=>{
+        vetDone(el);
+        el.classList.remove('holding');
+        sfx.pop();
+        floatEmoji(sp.x, sp.y-26, '💗');
+        toast(sp.x-40, sp.y-66, sp.say);
+        say(sp.say);
+        if(--left === 0){
+          sfx.yay();
+          stepDone();
+          setTimeout(vetStep4, 1500);
+        }
+      }, 1100);
+    };
+    const stop = ()=>{ el.classList.remove('holding'); if(t){ clearTimeout(t); t = null; } };
+    el.addEventListener('pointerdown', start);
+    el.addEventListener('pointerup', stop);
+    el.addEventListener('pointerleave', stop);
+    el.addEventListener('pointercancel', stop);
+  });
+}
+/* ---- 4. treats for being brave ---- */
+function vetStep4(){
+  document.querySelectorAll('.vspot').forEach(e=>e.remove());
+  instruct("Rosie was brave! Give her 3 treats.");
+  clearChoices();
+  let fed = 0;
+  ['🦴','🍪','🥫'].forEach(t=>{
+    addChoice(t, 'Treat', 'c-yellow', (b)=>{
+      if(b.disabled) return;
+      b.disabled = true;
+      b.style.visibility = 'hidden';
+      fed++;
+      const mine = fed;
+      const e = document.createElement('div');
+      e.className = 'vetItem';
+      e.style.cssText = 'position:absolute;z-index:25;font-size:42px;pointer-events:none;transition:left .6s ease,top .6s ease,transform .6s;';
+      e.textContent = t;
+      e.style.left = '380px'; e.style.top = '470px';
+      document.getElementById('vetScene').appendChild(e);
+      requestAnimationFrame(()=>{ e.style.left = '392px'; e.style.top = '238px'; e.style.transform = 'scale(.4)'; });
+      setTimeout(()=>{
+        e.remove();
+        sfx.munch();
+        rosie.classList.add('happy','wiggle');
+        setTimeout(()=>rosie.classList.remove('wiggle'), 500);
+        toast(430, 190, "Nom nom!");
+        if(mine === 3){
+          clearChoices();
+          sfx.yay();
+          say("Good girl Rosie! You were so brave.");
+          instrText.textContent = "Good girl, Rosie!";
+          stepDone();
+          setTimeout(vetStep5, 1600);
+        }
+      }, 650);
+    });
+  });
+}
+/* ---- 5. medicine: fill the syringe to the line ---- */
+function vetStep5(){
+  clearChoices();
+  const target = 4 + Math.floor(Math.random()*4);   // 4..7 ml
+  vetState.med = { target, fill:0, dragging:false, tries:0 };
+  instruct(`Fill the medicine to ${target}. Drag the blue part!`);
+  const ui = document.createElement('div');
+  ui.className = 'vetItem syringe';
+  ui.innerHTML = `
+    <div class="barrel">
+      <div class="fluid" id="medFluid"></div>
+      <div class="marks" id="medMarks"></div>
+      <div class="targetLine" id="medTarget"></div>
+    </div>
+    <div class="plunger" id="medPlunger">⬅︎ drag</div>
+    <div class="needle"></div>`;
+  document.getElementById('vetScene').appendChild(ui);
+  const marks = ui.querySelector('#medMarks');
+  for(let i = 1; i <= 10; i++){
+    const m = document.createElement('div');
+    m.className = 'mk';
+    m.style.left = (i*10) + '%';
+    m.innerHTML = `<span>${i}</span>`;
+    marks.appendChild(m);
+  }
+  ui.querySelector('#medTarget').style.left = (target*10) + '%';
+  const plunger = ui.querySelector('#medPlunger');
+  const barrel = ui.querySelector('.barrel');
+  function setFill(ml){
+    vetState.med.fill = Math.max(0, Math.min(10, ml));
+    ui.querySelector('#medFluid').style.width = (vetState.med.fill*10) + '%';
+    plunger.style.left = 'calc(' + (vetState.med.fill*10) + '% - 6px)';
+  }
+  setFill(0);
+  function fromEvent(ev){
+    const r = barrel.getBoundingClientRect();
+    setFill(Math.round(((ev.clientX - r.left)/r.width)*10));
+  }
+  plunger.addEventListener('pointerdown', (ev)=>{
+    vetState.med.dragging = true;
+    plunger.setPointerCapture(ev.pointerId);
+  });
+  plunger.addEventListener('pointermove', (ev)=>{ if(vetState.med.dragging) fromEvent(ev); });
+  barrel.addEventListener('pointerdown', fromEvent);
+  plunger.addEventListener('pointerup', ()=>{
+    if(!vetState.med.dragging) return;
+    vetState.med.dragging = false;
+    checkMed();
+  });
+  function checkMed(){
+    const m = vetState.med;
+    if(m.fill === m.target){
+      sfx.yay();
+      toast(300, 300, "Just right!");
+      say("Perfect! Now give it to Rosie.");
+      instrText.textContent = "Now tap Rosie's mouth!";
+      const mouth = vetSpot(400, 250, '💧', 'Give it');
+      mouth.addEventListener('pointerdown', ()=>{
+        if(mouth.classList.contains('done')) return;
+        vetDone(mouth);
+        ui.remove();
+        sfx.munch();
+        floatEmoji(400, 220, '💊');
+        toast(430, 190, "Gulp! All gone.");
+        say("Gulp! Good girl.");
+        stepDone();
+        setTimeout(()=>{ document.querySelectorAll('.vspot').forEach(e=>e.remove()); vetStep6(); }, 1600);
+      });
+    } else {
+      m.tries++;
+      sfx.no();
+      toast(300, 300, m.fill > m.target ? "Too much!" : "Not enough!");
+      say(m.fill > m.target ? "That's too much. Slide it back a bit." : "A bit more please.");
+      if(m.tries >= 2) ui.querySelector('#medTarget').classList.add('flash');
+    }
+  }
+}
+/* ---- 6. vaccination: hold still and count to three ---- */
+function vetStep6(){
+  instruct("Vaccination time. Press and hold. Count to 3!");
+  const el = vetSpot(348, 258, '💉', 'Hold');
+  el.classList.add('holdable');
+  const ring = document.createElement('div');
+  ring.className = 'holdRing big';
+  el.appendChild(ring);
+  const num = document.createElement('div');
+  num.className = 'countNum';
+  el.appendChild(num);
+  let t = null, count = 0;
+  const stop = (done)=>{
+    el.classList.remove('holding');
+    num.textContent = '';
+    if(t){ clearInterval(t); t = null; }
+    if(!done && count > 0 && count < 3){
+      sfx.no();
+      toast(300, 200, "Nearly! Hold longer.");
+      say("Nearly! Hold it a bit longer.");
+    }
+    count = 0;
+  };
+  el.addEventListener('pointerdown', ()=>{
+    if(el.classList.contains('done')) return;
+    el.classList.add('holding');
+    count = 0;
+    num.textContent = '3';
+    tone(500, .1, 'sine', .1);
+    t = setInterval(()=>{
+      count++;
+      if(count < 3){
+        num.textContent = String(3 - count);
+        tone(500 + count*80, .1, 'sine', .1);
+      } else {
+        stop(true);
+        vetDone(el);
+        sfx.yay();
+        floatEmoji(348, 230, '🩹');
+        toast(300, 200, "All done! So brave.");
+        say("All done! Rosie was so brave. She gets a sticker!");
+        rosie.classList.add('happy');
+        stepDone();
+        setTimeout(()=>{ document.querySelectorAll('.vspot').forEach(e=>e.remove()); vetStep7(); }, 1800);
+      }
+    }, 800);
+  });
+  el.addEventListener('pointerup', ()=>stop(false));
+  el.addEventListener('pointerleave', ()=>stop(false));
+  el.addEventListener('pointercancel', ()=>stop(false));
+}
+/* ---- 7. heart and lungs: listen and count the beats ---- */
+function vetStep7(){
+  instruct("Last one! Listen to her heart. Tap the chest.");
+  const beats = 3 + Math.floor(Math.random()*3);   // 3..5
+  vetState.beats = beats;
+  vetState.heartTries = 0;
+  const chest = vetSpot(400, 300, '🩺', 'Listen');
+  chest.addEventListener('pointerdown', ()=>{
+    if(chest.classList.contains('listening')) return;
+    chest.classList.add('listening');
+    playHeart(beats, ()=>{
+      chest.classList.remove('listening');
+      askBeats();
+    });
+  });
+}
+function playHeart(n, done){
+  tool.textContent = '🩺';
+  tool.style.display = 'block';
+  tool.style.left = '430px'; tool.style.top = '258px';
+  instrText.textContent = "Listen... count the beats!";
+  let i = 0;
+  const pulse = ()=>{
+    if(i >= n){
+      setTimeout(()=>{ tool.style.display = 'none'; done(); }, 700);
+      return;
+    }
+    i++;
+    tone(150, .13, 'sine', .22);
+    setTimeout(()=>tone(110, .16, 'sine', .18), 130);
+    const ring = document.createElement('div');
+    ring.className = 'beatRing vetItem';
+    ring.style.left = '360px'; ring.style.top = '260px';
+    document.getElementById('vetScene').appendChild(ring);
+    setTimeout(()=>ring.remove(), 800);
+    setTimeout(pulse, 900);
+  };
+  setTimeout(pulse, 400);
+}
+function askBeats(){
+  const n = vetState.beats;
+  instruct("How many beats did you hear?");
+  clearChoices();
+  const opts = [n-1, n, n+1].filter(v=>v > 0);
+  while(opts.length < 3) opts.push(Math.max(...opts)+1);
+  for(let i = opts.length-1; i > 0; i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [opts[i], opts[j]] = [opts[j], opts[i]];
+  }
+  const btns = [];
+  opts.forEach(v=>{
+    const b = addChoice(String(v), v === 1 ? 'beat' : 'beats', 'c-pink', ()=>{
+      if(v === n){
+        clearChoices();
+        sfx.yay();
+        toast(300, 200, "That's right!");
+        say("That's right! Her heart is strong and healthy.");
+        stepDone();
+        setTimeout(finishVet, 1700);
+      } else {
+        vetState.heartTries++;
+        sfx.no();
+        toast(300, 200, "Let's listen again!");
+        say("Let's listen again. Count carefully!");
+        clearChoices();
+        const chest = document.querySelector('.vspot');
+        setTimeout(()=>playHeart(n, askBeats), 1200);
+      }
+    });
+    btns.push({ b, v });
+  });
+  if(vetState.heartTries >= 2){
+    const right = btns.find(x=>x.v === n);
+    if(right) right.b.classList.add('correct-glow');
+  }
+}
+function finishVet(){
+  document.querySelectorAll('.vspot').forEach(e=>e.remove());
+  rosie.classList.add('sparkly','happy');
+  S.vets = (S.vets || 0) + 1; save();
+  confettiBurst();
+  sfx.yay();
+  instrText.textContent = "Rosie had her check-up!";
+  say("All finished! Rosie is healthy and happy. You are a great vet!");
+  setTimeout(()=>showWin('🩺🐶','Rosie had her check-up!','She is healthy and happy. Great vet work!','🩺','Again!'), 1600);
+}
+
 /* ================= Overlays ================= */
 function showOverlay(id){ document.getElementById(id).classList.add('show'); }
 function hideOverlay(id){ document.getElementById(id).classList.remove('show'); }
@@ -1962,7 +2508,7 @@ document.querySelectorAll('.closeX').forEach(b=>{
 
 document.getElementById('winAgain').addEventListener('click', ()=>{
   hideOverlay('winOverlay');
-  if(lastMode === 'park') startPark(); else startBath();
+  if(lastMode === 'park') startPark(); else if(lastMode === 'vet') startVet(); else startBath();
 });
 document.getElementById('winMenu').addEventListener('click', ()=>{
   hideOverlay('winOverlay'); showMenu();
@@ -1980,6 +2526,7 @@ function showMenu(){
 }
 document.getElementById('menuBath').addEventListener('click', ()=>{ hideOverlay('menuOverlay'); startBath(); });
 document.getElementById('menuPark').addEventListener('click', ()=>{ hideOverlay('menuOverlay'); startPark(); });
+document.getElementById('menuVet').addEventListener('click', ()=>{ hideOverlay('menuOverlay'); startVet(); });
 
 /* ---------- Grown-ups ---------- */
 let gateAnswer = 0;
@@ -2005,7 +2552,7 @@ document.getElementById('gateGo').addEventListener('click', ()=>{
   }
 });
 function renderGrown(){
-  document.getElementById('bathCount').textContent = S.baths + ' baths, ' + S.parks + ' park visits';
+  document.getElementById('bathCount').textContent = S.baths + ' baths, ' + S.parks + ' park visits, ' + (S.vets||0) + ' vet visits';
   renderVoiceList();
 }
 document.getElementById('makeBackup').addEventListener('click', ()=>{
